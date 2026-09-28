@@ -190,7 +190,7 @@ def legibility_forecast(spec):
     """Best achievable effective font size, computed before any routing.
 
     Canvas width is set by content plus padding. The search varies order, mode,
-    group padding and attachment sides — none of which remove content — so if the
+    group padding and attachment sides (none of which remove content), so if the
     tightest layout already puts text below the floor, every candidate will fail
     the same way no matter how long the search runs. Checking first turns a search
     that was always going to be rejected into an immediate, actionable answer.
@@ -218,7 +218,7 @@ def crossings_only_budget(evaluated):
 
     Routing is the expensive step and it has already happened, so this costs
     nothing. It exists because the alternative is the caller re-running the whole
-    search at guessed budgets at roughly a minute each — the single largest
+    search at guessed budgets at roughly a minute each: the single largest
     source of wasted iteration on a dense graph.
     """
     counts = [r["crossingCount"] for _, _, r, _ in evaluated
@@ -244,7 +244,7 @@ def build(spec, out, quick=False, refine=False, recipe=None, max_crossings=None,
             raise Infeasible(
                 f"This content cannot be legible at a {display}px display width. The most "
                 f"compact layout puts the smallest text at {best_font:.2f}px against a "
-                f"{FONT_FLOOR}px floor, and routing cannot change canvas width — every "
+                f"{FONT_FLOOR}px floor, and routing cannot change canvas width; every "
                 f"candidate would fail the same way, so the search is skipped.\n"
                 f"Fix it at the source, not by searching:\n"
                 f"  - remove content (fewer nodes, fewer sub-lines, shorter labels), or\n"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""doctor.py — preflight for the architecture-diagram engine.
+"""doctor.py: preflight for the architecture-diagram engine.
 
 The engine needs dependencies that are not guaranteed on an arbitrary machine.
 Without this check the failures are confusing and late: a missing Pillow surfaces
@@ -112,7 +112,7 @@ def main() -> int:
             if not c["ok"] and c["fix"]:
                 print(f"         fix: {c['fix']}")
         if hard_fail:
-            print(f"\n  NOT READY — {len(hard_fail)} hard requirement(s) missing. "
+            print(f"\n  NOT READY: {len(hard_fail)} hard requirement(s) missing. "
                   f"Fix the above before building; do not report a diagram as failed "
                   f"when the engine never ran.")
         elif soft_fail:

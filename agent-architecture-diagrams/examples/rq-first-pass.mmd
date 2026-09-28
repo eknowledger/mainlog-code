@@ -1,7 +1,7 @@
 flowchart LR
     producer["Producer"]
 
-    subgraph redis["Redis — shared data"]
+    subgraph redis["Redis: shared data"]
         queue["Queue IDs"]
         job["Job record"]
         outcomes["Outcome records<br/>(retained)"]

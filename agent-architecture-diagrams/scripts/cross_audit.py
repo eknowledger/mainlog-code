@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""cross_audit.py — an ENGINE-INDEPENDENT auditor for layered architecture SVGs.
+"""cross_audit.py: an ENGINE-INDEPENDENT auditor for layered architecture SVGs.
 
 Purpose
 -------
