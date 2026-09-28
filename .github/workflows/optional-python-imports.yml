@@ -1,0 +1,39 @@
+name: optional-python-imports
+# Runs only when this post's folder changes. Checks the test passes as published AND fails once the import is
+# made eager, because a test for something not happening proves little until it has been seen to fail.
+on:
+  push:
+    paths: ["optional-python-imports/**", ".github/workflows/optional-python-imports.yml"]
+  pull_request:
+    paths: ["optional-python-imports/**", ".github/workflows/optional-python-imports.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]   # the two versions the post was checked on
+    defaults:
+      run:
+        working-directory: optional-python-imports
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: The test passes as published
+        run: |
+          out=$(python3 test_import_contract.py)
+          echo "$out"
+          test "$out" = "PASS: runtime_helpers leaves optional_toolkit unloaded"
+      - name: And fails once the import moves to module level
+        run: |
+          cp -r . /tmp/eager && cd /tmp/eager
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path("runtime_helpers.py")
+          s = p.read_text().replace("    import optional_toolkit\n", "")
+          p.write_text("import optional_toolkit\n" + s)
+          PY
+          if python3 test_import_contract.py > out.txt 2>&1; then echo "expected a failure"; cat out.txt; exit 1; fi
+          grep -F "AssertionError: Import loaded forbidden modules: optional_toolkit" out.txt

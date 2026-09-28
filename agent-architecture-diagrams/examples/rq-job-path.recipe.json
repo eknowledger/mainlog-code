@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "config": {
+    "width": 1280,
+    "gap": 44,
+    "outer": 54,
+    "grow": 1.35,
+    "mode": "align",
+    "orders": {
+      "submit": [
+        "producer"
+      ],
+      "run": [
+        "worker",
+        "function"
+      ],
+      "finish": [
+        "success",
+        "failure",
+        "reader"
+      ]
+    },
+    "groupPad": 16,
+    "spineGap": 76,
+    "columnGap": 52.0,
+    "portSides": {
+      "dequeue": {
+        "source": "W",
+        "target": "S"
+      },
+      "read-result": {
+        "source": "W",
+        "target": "S"
+      },
+      "save-job": {
+        "source": "S",
+        "target": "N"
+      },
+      "save-failure": {
+        "source": "S",
+        "target": "S"
+      }
+    },
+    "straightEdges": {
+      "returned": {
+        "axis": "vertical",
+        "fraction": 0.5
+      }
+    }
+  },
+  "portMode": "choice",
+  "sourceSha256": "3a48e75fae47c9b3fc63dcc14cf9e95d187eb98c7c393c8f0465281a05d70274",
+  "router": "libavoid-js@0.4.5",
+  "requirements": {
+    "maxCrossings": 3
+  }
+}

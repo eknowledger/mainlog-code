@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "id": "skill-call-map",
+  "title": "The agent calls two tools; build.py coordinates the drawing",
+  "subtitle": "Arrows show calls. Boxes list inputs and outputs; the sequence diagram shows the return flow.",
+  "targetWidth": 1200,
+  "stages": [
+    {
+      "id": "host",
+      "label": "Agent host",
+      "category": "model"
+    },
+    {
+      "id": "tools",
+      "label": "Tools invoked by the agent",
+      "category": "route"
+    },
+    {
+      "id": "helpers",
+      "label": "Helpers used by build.py",
+      "category": "context"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "agent",
+      "title": "1. Agent",
+      "parent": "host",
+      "category": "model",
+      "lines": [
+        "reads SKILL.md + sources",
+        "writes model.json; reviews PNG"
+      ]
+    },
+    {
+      "id": "build",
+      "title": "2. build.py",
+      "parent": "tools",
+      "category": "route",
+      "lines": [
+        "in: model.json",
+        "out: drawings, model, recipe, report"
+      ]
+    },
+    {
+      "id": "independent",
+      "title": "5. cross_audit.py",
+      "parent": "tools",
+      "category": "safety",
+      "lines": [
+        "in: selected SVG",
+        "out: separate geometry report"
+      ]
+    },
+    {
+      "id": "router",
+      "title": "3. router.mjs + libavoid",
+      "parent": "helpers",
+      "category": "context",
+      "lines": [
+        "in: rectangles + connection sites",
+        "out: edge point lists"
+      ]
+    },
+    {
+      "id": "audit",
+      "title": "4. audit.py",
+      "parent": "helpers",
+      "category": "safety",
+      "lines": [
+        "in: candidate SVG + model",
+        "out: findings + drawing measures"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "build-call",
+      "from": "agent",
+      "to": "build",
+      "label": "build diagram",
+      "kind": "command"
+    },
+    {
+      "id": "independent-call",
+      "from": "agent",
+      "to": "independent",
+      "label": "check selected result",
+      "kind": "command"
+    },
+    {
+      "id": "router-call",
+      "from": "build",
+      "to": "router",
+      "label": "route connections",
+      "kind": "command"
+    },
+    {
+      "id": "audit-call",
+      "from": "build",
+      "to": "audit",
+      "label": "check each candidate",
+      "kind": "command"
+    }
+  ],
+  "orders": [
+    [
+      "build",
+      "independent"
+    ],
+    [
+      "router",
+      "audit"
+    ]
+  ]
+}

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scenariokit"
+version = "0.1.0"
+description = "Write end-to-end scenarios as async functions and run them with pytest."
+requires-python = ">=3.10"
+
+[project.entry-points.pytest11]
+scenariokit = "scenariokit.pytest_plugin"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--ignore=tests/examples"]

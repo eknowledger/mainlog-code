@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "id": "rq-job-path",
+  "title": "An RQ job crosses execution phases; Redis holds shared state",
+  "subtitle": "A new diagram of the ordinary asynchronous path \u2022 retries and dependencies omitted",
+  "targetWidth": 1200,
+  "stages": [
+    {
+      "id": "submit",
+      "label": "Submit",
+      "category": "speech"
+    },
+    {
+      "id": "run",
+      "label": "Dequeue and execute",
+      "category": "model"
+    },
+    {
+      "id": "finish",
+      "label": "Record and read the outcome",
+      "category": "route"
+    }
+  ],
+  "spines": [
+    {
+      "id": "redis",
+      "label": "Redis data",
+      "category": "context",
+      "fromStage": "submit",
+      "toStage": "finish"
+    }
+  ],
+  "groups": [],
+  "nodes": [
+    {
+      "id": "producer",
+      "title": "Producer",
+      "parent": "submit",
+      "category": "speech",
+      "lines": [
+        "calls Queue.enqueue(...)"
+      ]
+    },
+    {
+      "id": "queue",
+      "title": "Queue IDs",
+      "parent": "redis",
+      "atStage": "submit",
+      "category": "context",
+      "lines": [
+        "job IDs waiting to run"
+      ]
+    },
+    {
+      "id": "job",
+      "title": "Job record",
+      "parent": "redis",
+      "atStage": "run",
+      "category": "context",
+      "lines": [
+        "function and arguments"
+      ]
+    },
+    {
+      "id": "worker",
+      "title": "Worker loop",
+      "parent": "run",
+      "category": "model",
+      "lines": [
+        "takes ID and loads job"
+      ]
+    },
+    {
+      "id": "function",
+      "title": "Job function",
+      "parent": "run",
+      "category": "model",
+      "lines": [
+        "runs Python work"
+      ]
+    },
+    {
+      "id": "success",
+      "title": "Success handling",
+      "parent": "finish",
+      "category": "route",
+      "lines": [
+        "records return value"
+      ]
+    },
+    {
+      "id": "failure",
+      "title": "Failure handling",
+      "parent": "finish",
+      "category": "safety",
+      "lines": [
+        "records exception"
+      ]
+    },
+    {
+      "id": "reader",
+      "title": "Result reader",
+      "parent": "finish",
+      "category": "speech",
+      "lines": [
+        "looks up a known job"
+      ]
+    },
+    {
+      "id": "result",
+      "title": "Outcome records",
+      "parent": "redis",
+      "atStage": "finish",
+      "category": "context",
+      "lines": [
+        "results and registries"
+      ]
+    }
+  ],
+  "outcomes": [],
+  "edges": [
+    {
+      "id": "save-job",
+      "from": "producer",
+      "to": "job",
+      "label": "store job",
+      "kind": "command"
+    },
+    {
+      "id": "enqueue",
+      "from": "producer",
+      "to": "queue",
+      "label": "enqueue ID",
+      "kind": "command"
+    },
+    {
+      "id": "dequeue",
+      "from": "queue",
+      "to": "worker",
+      "label": "take ID",
+      "kind": "read"
+    },
+    {
+      "id": "fetch",
+      "from": "job",
+      "to": "worker",
+      "label": "load job",
+      "kind": "read"
+    },
+    {
+      "id": "execute",
+      "from": "worker",
+      "to": "function",
+      "label": "execute",
+      "kind": "command"
+    },
+    {
+      "id": "returned",
+      "from": "function",
+      "to": "success",
+      "label": "returns",
+      "kind": "event"
+    },
+    {
+      "id": "raised",
+      "from": "function",
+      "to": "failure",
+      "label": "raises",
+      "kind": "event"
+    },
+    {
+      "id": "save-success",
+      "from": "success",
+      "to": "result",
+      "label": "save success",
+      "kind": "command"
+    },
+    {
+      "id": "save-failure",
+      "from": "failure",
+      "to": "result",
+      "label": "save failure",
+      "kind": "command"
+    },
+    {
+      "id": "read-result",
+      "from": "result",
+      "to": "reader",
+      "label": "read result",
+      "kind": "read"
+    }
+  ],
+  "orders": [
+    [
+      "worker",
+      "function"
+    ],
+    [
+      "success",
+      "failure",
+      "reader"
+    ]
+  ]
+}

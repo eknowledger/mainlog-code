@@ -1,0 +1,48 @@
+name: agent-architecture-diagrams
+# Runs only when this post's folder changes: the bundle's own tests, then the post's example built and checked by
+# both auditors, exactly as the README runs it.
+on:
+  push:
+    paths: ["agent-architecture-diagrams/**", ".github/workflows/agent-architecture-diagrams.yml"]
+  pull_request:
+    paths: ["agent-architecture-diagrams/**", ".github/workflows/agent-architecture-diagrams.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent-architecture-diagrams
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: System dependencies
+        # Arial is not on the runner. The engine measures text with Arial's metrics, so it installs Microsoft's core
+        # fonts, whose EULA has to be accepted non-interactively. Nothing here is committed to the repository.
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin ttf-mscorefonts-installer fontconfig
+          fc-list | grep -i "arial" | head -3
+      - run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt
+          npm ci --ignore-scripts
+      - run: |
+          export DIAGRAM_FONT_REGULAR="$(fc-match -f '%{file}' 'Arial:style=Regular')"
+          export DIAGRAM_FONT_BOLD="$(fc-match -f '%{file}' 'Arial:style=Bold')"
+          .venv/bin/python scripts/doctor.py
+      - name: The bundle's own tests
+        run: .venv/bin/python -B -m unittest discover -s scripts -p 'test_*.py'
+      - name: The post's example, built and checked by both auditors
+        run: |
+          export DIAGRAM_FONT_REGULAR="$(fc-match -f '%{file}' 'Arial:style=Regular')"
+          export DIAGRAM_FONT_BOLD="$(fc-match -f '%{file}' 'Arial:style=Bold')"
+          .venv/bin/python scripts/build.py examples/rq-job-path.json --out output/rq --crossings 3 --quick
+          .venv/bin/python scripts/audit.py output/rq/rq-job-path.svg --spec examples/rq-job-path.json --crossings 3
+          .venv/bin/python scripts/cross_audit.py --strict --max-crossings 3 output/rq/rq-job-path.svg

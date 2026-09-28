@@ -1,0 +1,45 @@
+name: pytest-plugin-ci-only-failures
+# Runs only when this post's folder changes. The point of the post is a suite that passes from source and fails
+# once installed, so this checks all four results in its table, including the two failures that must stay failures.
+on:
+  push:
+    paths: ["pytest-plugin-ci-only-failures/**", ".github/workflows/pytest-plugin-ci-only-failures.yml"]
+  pull_request:
+    paths: ["pytest-plugin-ci-only-failures/**", ".github/workflows/pytest-plugin-ci-only-failures.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: before-fixes
+            source: "2 passed"
+            wheel: "2 failed, 1 passed"
+          - version: after-fixes
+            source: "2 passed"
+            wheel: "2 passed"
+    defaults:
+      run:
+        working-directory: pytest-plugin-ci-only-failures/${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: From source, the way the suite passed locally
+        run: |
+          python -m venv --clear /tmp/source-run
+          /tmp/source-run/bin/pip install pytest==9.1.1
+          PYTHONPATH=src /tmp/source-run/bin/python -m pytest -q -p no:cacheprovider | tee /tmp/out.txt || true
+          tail -1 /tmp/out.txt | grep -E "^${{ matrix.source }} in "
+      - name: Against the installed wheel, the way CI ran it
+        run: |
+          python -m pip install build
+          python -m build --wheel
+          python -m venv --clear /tmp/wheel-check
+          /tmp/wheel-check/bin/pip install pytest==9.1.1 dist/scenariokit-0.1.0-py3-none-any.whl
+          /tmp/wheel-check/bin/python -c "import scenariokit; print(scenariokit.__file__)" | grep /tmp/wheel-check/
+          /tmp/wheel-check/bin/python -m pytest -q -p no:cacheprovider | tee /tmp/out.txt || true
+          tail -1 /tmp/out.txt | grep -E "^${{ matrix.wheel }} in "

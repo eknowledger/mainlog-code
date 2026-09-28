@@ -1,0 +1,12 @@
+{
+  "name": "architecture-diagram-skill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Source and tools accompanying the diagram skill article",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "libavoid-js": "0.4.5"
+  }
+}

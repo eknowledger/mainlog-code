@@ -1,0 +1,32 @@
+flowchart LR
+    producer["Producer"]
+
+    subgraph redis["Redis — shared data"]
+        queue["Queue IDs"]
+        job["Job record"]
+        outcomes["Outcome records<br/>(retained)"]
+    end
+
+    worker["Worker loop"]
+    fn["Python job function"]
+    success["Success handling"]
+    failure["Failure handling"]
+    reader["Result reader"]
+
+    producer -->|"save job"| job
+    producer -->|"enqueue ID"| queue
+    queue -->|"take ID"| worker
+    job -->|"load job"| worker
+    worker -->|"execute"| fn
+    fn -->|"returns"| success
+    fn -->|"raises"| failure
+    success -->|"write success outcome"| outcomes
+    failure -->|"write failure outcome"| outcomes
+    outcomes -->|"read result"| reader
+
+    classDef stored fill:#eff6ff,stroke:#2563eb,color:#172554;
+    classDef succeeded fill:#f0fdf4,stroke:#15803d,color:#14532d;
+    classDef failed fill:#fef2f2,stroke:#b91c1c,color:#7f1d1d;
+    class queue,job,outcomes stored;
+    class success succeeded;
+    class failure failed;

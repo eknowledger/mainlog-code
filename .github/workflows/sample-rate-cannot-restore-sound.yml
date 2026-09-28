@@ -1,0 +1,51 @@
+name: sample-rate-cannot-restore-sound
+# Runs only when this post's folder changes, and fails if the measurement stops printing what the post quotes.
+on:
+  push:
+    paths: ["sample-rate-cannot-restore-sound/**", ".github/workflows/sample-rate-cannot-restore-sound.yml"]
+  pull_request:
+    paths: ["sample-rate-cannot-restore-sound/**", ".github/workflows/sample-rate-cannot-restore-sound.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sample-rate-cannot-restore-sound
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: The measurement matches the post
+        run: |
+          cat > /tmp/expected.txt <<'TXT'
+          original     48000 Hz  48000 samples  1.000 s  [1000, 3000, 6000]
+          downsampled   8000 Hz   8000 samples  1.000 s  [1000, 3000]
+          upsampled    48000 Hz  48000 samples  1.000 s  [1000, 3000]
+          consumer     16000 Hz  16000 samples  1.000 s  [1000, 3000]
+          unfiltered    8000 Hz   8000 samples  1.000 s  [1000, 2000, 3000]
+          TXT
+          sed -i 's/^          //' /tmp/expected.txt
+          python3 resampling_demo.py | tee /tmp/actual.txt
+          diff /tmp/expected.txt /tmp/actual.txt
+      - name: The walkthrough matches the post
+        run: |
+          cat > /tmp/expected.txt <<'TXT'
+          original     48000 samples  1.000 s
+          downsampled   8000 samples  1.000 s
+          upsampled    48000 samples  1.000 s
+          consumer     16000 samples  1.000 s
+          unfiltered    8000 samples  1.000 s
+          TXT
+          sed -i 's/^          //' /tmp/expected.txt
+          python3 resample_walkthrough.py | tee /tmp/actual.txt
+          diff /tmp/expected.txt /tmp/actual.txt
+      - name: The figure generators still run
+        run: |
+          python3 plot_experiment.py --out /tmp/figures
+          python3 plot_sampling_basics.py --out /tmp/figures
+          ls /tmp/figures

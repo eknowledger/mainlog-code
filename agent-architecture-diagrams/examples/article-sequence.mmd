@@ -1,0 +1,23 @@
+sequenceDiagram
+    autonumber
+    participant A as Agent
+    participant B as build.py (Python)
+    participant R as router.mjs (Node)
+    participant N as audit.py (Python)
+    participant X as cross_audit.py
+    A->>A: Read SKILL.md format and source material
+    A->>A: Write model.json using the skill's format
+    A->>B: Build diagram from model.json
+    loop Try bounded drawing candidates
+        B->>B: Measure text and place rectangles
+        B->>R: Rectangles, obstacles, connection sites
+        R-->>B: Edge IDs and point lists
+        B->>B: Place labels and emit SVG
+        B->>N: SVG + expected model
+        N-->>B: Findings and drawing measures
+        B->>B: Rank candidate and choose next trial
+    end
+    B-->>A: SVG, PNG, model, recipe and report
+    A->>X: Check selected SVG independently
+    X-->>A: Second geometry report
+    A->>A: Inspect preview at document width
