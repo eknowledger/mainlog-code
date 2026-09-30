@@ -7,6 +7,7 @@ first in the series *Real-time voice, from the packet up*.
 |---|---|
 | `build_packet.py` | Encodes 20 ms of sound with Opus, wraps it in real RTP, UDP and IPv4 headers (checksums included), prints the packet layer by layer, and writes one second of it to `voice.pcap` |
 | `one_lost_packet.py` | A model of one lost packet delivered over UDP and over TCP, printing which frames still play on time |
+| `draw_timeline.py` | Draws that model as `one_lost_packet.svg`, the figure in the post |
 | `requirements.txt` | PyAV, which ships libopus in its wheels, and NumPy |
 
 ## Run it

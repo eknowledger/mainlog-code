@@ -8,3 +8,4 @@ build/
 *.egg-info/
 .DS_Store
 voice-packet/voice.pcap
+voice-packet/one_lost_packet.svg

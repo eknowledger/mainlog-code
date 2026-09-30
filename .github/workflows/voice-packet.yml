@@ -56,3 +56,7 @@ jobs:
           grep -F "UDP: 1 frame(s) not played on time = 20 ms" /tmp/loss.txt
           grep -F "TCP, fast retransmit: 4 frame(s) not played on time = 80 ms" /tmp/loss.txt
           grep -F "TCP, 200 ms timeout: 8 frame(s) not played on time = 160 ms" /tmp/loss.txt
+      - name: The figure draws from the same model
+        run: |
+          python draw_timeline.py
+          grep -c 'fill="url(#hatch)"' one_lost_packet.svg | grep -qx 14   # 1 + 4 + 8 missed frames, plus the legend swatch
