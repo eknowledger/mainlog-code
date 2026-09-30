@@ -1,0 +1,58 @@
+name: voice-packet
+# Runs only when this post's folder changes, and fails if either script stops printing what the post quotes.
+on:
+  push:
+    paths: ["voice-packet/**", ".github/workflows/voice-packet.yml"]
+  pull_request:
+    paths: ["voice-packet/**", ".github/workflows/voice-packet.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: voice-packet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt scapy==2.7.0
+      - name: The packet is what the post says it is
+        run: |
+          python build_packet.py | tee /tmp/out.txt
+          grep -F "Opus at 32 kb/s: 80 B per frame" /tmp/out.txt
+          grep -F "45 b8 00 78 3a 0a 40 00 40 11 13 61 c0 00 02 0a c6 33 64 14" /tmp/out.txt
+          # Ports and length only: the UDP checksum covers the Opus bytes, which can differ between libopus builds.
+          # Its correctness is checked by the independent parser below, whatever its value.
+          grep -F "d4 31 c3 54 00 64" /tmp/out.txt
+          grep -F "80 6f 03 f2 00 00 25 80 1f 2e 3d 4c" /tmp/out.txt
+          grep -F "decodes to 960 samples = 20 ms of audio" /tmp/out.txt
+          grep -F "Total        120 B  (40 B of headers, 80 B of sound)" /tmp/out.txt
+      - name: An independent parser agrees with every checksum and field
+        # scapy recomputes the IPv4 and UDP checksums and reads the RTP header itself, so the check does not rest on
+        # the same code that wrote the packets.
+        run: |
+          python - <<'PY'
+          from scapy.all import IP, UDP, rdpcap
+          from scapy.layers.rtp import RTP
+          pkts = rdpcap("voice.pcap")
+          assert len(pkts) == 50, len(pkts)
+          for p in pkts:
+              ip = p[IP]
+              fresh = IP(bytes(ip))
+              del fresh.chksum
+              del fresh[UDP].chksum
+              fresh = IP(bytes(fresh))
+              assert (fresh.chksum, fresh[UDP].chksum) == (ip.chksum, ip[UDP].chksum), "checksum mismatch"
+          r = RTP(bytes(pkts[10][UDP].payload))
+          assert (r.version, r.payload_type, r.sequence, r.timestamp) == (2, 111, 1010, 9600), r.summary()
+          assert len(r.payload) == 80
+          print("50 packets, every checksum and the RTP header agree")
+          PY
+      - name: One lost packet costs what the post says
+        run: |
+          python one_lost_packet.py | tee /tmp/loss.txt
+          grep -F "UDP: 1 frame(s) not played on time = 20 ms" /tmp/loss.txt
+          grep -F "TCP, fast retransmit: 4 frame(s) not played on time = 80 ms" /tmp/loss.txt
+          grep -F "TCP, 200 ms timeout: 8 frame(s) not played on time = 160 ms" /tmp/loss.txt
