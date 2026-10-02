@@ -2,8 +2,8 @@
 
     python fec_recovery.py
 
-Encodes with libopus through PyAV, as the first post's demo does, with FEC switched on. Decodes by calling
-libopus directly through ctypes, because recovering a frame from in-band FEC means asking the decoder to read the
+Encodes with libopus through PyAV, as the first post's demo does, with FEC switched on. Decodes by calling the
+same libopus, the copy inside PyAV's wheel, directly through ctypes, because recovering a frame from in-band FEC means asking the decoder to read the
 NEXT packet's redundant copy (`opus_decode(..., decode_fec=1)`), which PyAV does not expose. (The encoder's
 settings cannot go that way too: `opus_encoder_ctl` takes a variable argument list, which ctypes does not pass
 correctly on every platform, Apple silicon included.) The signal is a synthetic voiced sound, a 140 Hz harmonic series shaped like a vowel and pulsed four
@@ -33,15 +33,26 @@ EXPECTED_LOSS = 10  # percent, what the encoder is told to plan for
 LOST = 25  # which frame the network drops, half a second in
 FRAMES = 50
 
+def bundled_opus() -> list[str]:
+    """The libopus inside PyAV's wheel: the same library that encodes, on every platform PyAV ships for."""
+    import glob
+    import os
+
+    base = os.path.dirname(av.__file__)
+    return glob.glob(os.path.join(base, ".dylibs", "libopus*")) + glob.glob(os.path.join(os.path.dirname(base), "av.libs", "libopus*"))
+
+
 def load_opus() -> ctypes.CDLL:
-    for name in (ctypes.util.find_library("opus"), "libopus.so.0", "/opt/homebrew/lib/libopus.dylib", "libopus.dylib"):
+    # PyAV's own copy first, so the decoder matches the encoder and the result does not depend on what the system
+    # has installed: Ubuntu 24.04 ships libopus 1.4, which predates opus_packet_has_lbrr.
+    for name in (*bundled_opus(), ctypes.util.find_library("opus"), "libopus.so.0", "/opt/homebrew/lib/libopus.dylib", "libopus.dylib"):
         if not name:
             continue
         try:
             return ctypes.CDLL(name)
         except OSError:
             continue
-    sys.exit("libopus not found: apt install libopus0, or brew install opus")
+    sys.exit("libopus not found: pip install -r requirements.txt brings one with PyAV")
 
 
 opus = load_opus()

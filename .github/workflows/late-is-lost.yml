@@ -17,11 +17,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: sudo apt-get update && sudo apt-get install -y libopus0
       - run: pip install -r requirements.txt
       - name: The FEC copy beats concealment, as the post says
-        # The libopus build differs from the one the post was measured on, so the scores are checked as an order and
-        # a margin rather than to the decimal; the coverage line is the encoder's, from PyAV's pinned libopus.
+        # Both ends use the libopus inside the pinned PyAV wheel, but floating-point maths differs between machines,
+        # so the scores are checked as an order and a margin rather than to the decimal.
         run: |
           python fec_recovery.py | tee /tmp/out.txt
           grep -F "carries an FEC copy" /tmp/out.txt
