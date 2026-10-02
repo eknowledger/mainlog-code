@@ -1,0 +1,36 @@
+name: late-is-lost
+# Runs only when this post's folder changes, and fails if the demo stops printing what the post quotes.
+on:
+  push:
+    paths: ["late-is-lost/**", ".github/workflows/late-is-lost.yml"]
+  pull_request:
+    paths: ["late-is-lost/**", ".github/workflows/late-is-lost.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: late-is-lost
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y libopus0
+      - run: pip install -r requirements.txt
+      - name: The FEC copy beats concealment, as the post says
+        # The libopus build differs from the one the post was measured on, so the scores are checked as an order and
+        # a margin rather than to the decimal; the coverage line is the encoder's, from PyAV's pinned libopus.
+        run: |
+          python fec_recovery.py | tee /tmp/out.txt
+          grep -F "carries an FEC copy" /tmp/out.txt
+          grep -F "28 of 44 packets carry an FEC copy of the frame before them" /tmp/out.txt
+          python - <<'PY'
+          import re
+          text = open("/tmp/out.txt").read()
+          covered = [float(x) for x in re.findall(r"([\d.]+) dB where the next packet carries a copy", text)]
+          plc, fec = covered
+          assert fec > plc + 10, (plc, fec)
+          print(f"where a copy exists: FEC {fec} dB against concealment {plc} dB")
+          PY
