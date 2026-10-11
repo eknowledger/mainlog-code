@@ -1,0 +1,45 @@
+name: find-a-path
+# Runs only when this post's folder changes, and fails if either script stops printing what the post quotes.
+on:
+  push:
+    paths: ["find-a-path/**", ".github/workflows/find-a-path.yml"]
+  pull_request:
+    paths: ["find-a-path/**", ".github/workflows/find-a-path.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: find-a-path
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: The STUN bytes and the XOR are what the post shows
+        run: |
+          python stun.py | tee /tmp/stun.txt
+          grep -F "00 01 00 00 21 12 a4 42 b7 e7 a7 01 bc 5c a4 93 5d 33 93 47" /tmp/stun.txt
+          grep -F "00 20 00 08 00 01 f5 23 e1 12 a6 48" /tmp/stun.txt
+          grep -F "decoded back: 192.0.2.10:54321" /tmp/stun.txt
+          grep -F "it saw the request come from 127.0.0.1:" /tmp/stun.txt
+      - name: An independent parser reads the same bytes
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from aioice import stun
+          spec = importlib.util.spec_from_file_location("s", "stun.py"); s = importlib.util.module_from_spec(spec); spec.loader.exec_module(s)
+          txid = bytes.fromhex("b7e7a701bc5ca4935d339347")
+          assert stun.parse_message(s.binding_success(txid, "192.0.2.10", 54321)).attributes["XOR-MAPPED-ADDRESS"] == ("192.0.2.10", 54321)
+          stun.parse_message(s.with_fingerprint(s.binding_request(txid)))  # raises if the FINGERPRINT is wrong
+          print("aioice agrees with every field")
+          PY
+      - name: The priorities are RFC 8445's, and aioice's
+        run: |
+          python ice_priority.py | tee /tmp/ice.txt
+          grep -F "Every priority matched aioice." /tmp/ice.txt
+          grep -F "1. from 192.168.1.42:50004 to 198.51.100.20:50004" /tmp/ice.txt
+          grep -F "Pruned: Alice srflx -> server host" /tmp/ice.txt
+          grep -F "valid pair is Alice srflx -> server host, priority 7277816997797167102" /tmp/ice.txt

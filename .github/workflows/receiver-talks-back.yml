@@ -1,0 +1,77 @@
+name: receiver-talks-back
+# Runs only when this post's folder changes, and fails if a script stops printing what the post quotes.
+on:
+  push:
+    paths: ["receiver-talks-back/**", ".github/workflows/receiver-talks-back.yml"]
+  pull_request:
+    paths: ["receiver-talks-back/**", ".github/workflows/receiver-talks-back.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: receiver-talks-back
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The report bytes and the arithmetic need nothing installed
+        run: |
+          python rtcp_reports.py | tee /tmp/bare.txt
+          grep -F "aiortc is not installed; skipping the independent parse" /tmp/bare.txt
+      - run: pip install -r requirements.txt
+      - name: The reports are what the post shows, and aiortc reads them the same
+        run: |
+          python rtcp_reports.py | tee /tmp/reports.txt
+          grep -F "A - LSR - DLSR = 0x0006:2000 (6.125000 s)" /tmp/reports.txt
+          grep -F "80 c8 00 06 1f 2e 3d 4c ee 69 d8 f0 40 00 00 00 00 02 ee 00 00 00 00 c8 00 00 3e 80" /tmp/reports.txt
+          grep -F "81 c9 00 07 7a 3b 9c 5d 1f 2e 3d 4c 06 00 00 06 00 00 04 e1 00 00 00 82 d8 f0 40 00 00 00 fd 70" /tmp/reports.txt
+          grep -F "expected 250 (seq 1000 to 1249), received 244, lost 6" /tmp/reports.txt
+          grep -F "fraction lost = (6 << 8) // 250 = 6, which reads back as 6/256 = 2.34% (the true share is 2.40%)" /tmp/reports.txt
+          grep -F "interarrival jitter: 130.29 units in floating point, 130 as the RFC's scaled integer, = 2.708 ms at 48 kHz" /tmp/reports.txt
+          grep -F "0.990 s later = 64880 units of 1/65536 s" /tmp/reports.txt
+          grep -F "round trip = A - LSR - DLSR = 3932 / 65536 s = 59.998 ms" /tmp/reports.txt
+          grep -F "with the 5 s minimum, Td = 5 s, so T falls in [2.052, 6.156] s, 4.104 s on average" /tmp/reports.txt
+          grep -F "the reduced minimum, 360 / 48 = 7.5 s, is no help below 72 kb/s" /tmp/reports.txt
+          grep -F "aiortc parses both compounds to the same fields, and re-serialises them to the same bytes." /tmp/reports.txt
+          python rtcp_reports.py --jitter-csv > /tmp/jitter.csv
+          test "$(wc -l < /tmp/jitter.csv)" -eq 244
+          grep -Fx "1249,5013.619,114,2.375,130.29,2.714" /tmp/jitter.csv
+      - name: The backoff model prints the post's numbers
+        run: |
+          python backoff_sim.py | tee /tmp/sim.txt
+          grep -F "RR every 5 s: lowest Opus 16.3 kb/s, first reached at 45 s; at 60 s, when the loss stops, 16.3 kb/s with 7.0% reported loss; 237 packets lost in all; back at 32 kb/s 45 s later" /tmp/sim.txt
+          grep -F "RR every 1 s: lowest Opus 16.3 kb/s, first reached at 33 s; at 60 s, when the loss stops, 16.3 kb/s with 7.0% reported loss; 132 packets lost in all; back at 32 kb/s 9 s later" /tmp/sim.txt
+          grep -F "RR every 5 s: lowest Opus 19.3 kb/s, first reached at 60 s; at 60 s, when the loss stops, 19.3 kb/s with 14.8% reported loss; 200 packets lost in all; back at 32 kb/s 35 s later" /tmp/sim.txt
+          grep -F "RR every 1 s: lowest Opus 6.0 kb/s, first reached at 51 s; at 60 s, when the loss stops, 6.0 kb/s with 14.8% reported loss; 200 packets lost in all; back at 32 kb/s 16 s later" /tmp/sim.txt
+          python backoff_sim.py --csv squeeze > /tmp/squeeze.csv
+          test "$(wc -l < /tmp/squeeze.csv)" -eq 122
+          grep -Fx "35,30,23.00,39.00,0.3750,16.28,32.28,0.0703" /tmp/squeeze.csv
+      - name: Every report of one run, which the site's Bitrate under loss tool is checked against
+        run: |
+          python backoff_sim.py --reports squeeze --interval 5 | tee /tmp/reports5.txt
+          grep -F "first decrease at 35 s, 5 s after the loss began at 30 s, on 96/256 = 37.5%" /tmp/reports5.txt
+          grep -E "^ +35s +30 +96/256 37.50% +decrease +23.00 +39.00$" /tmp/reports5.txt
+          python backoff_sim.py --reports squeeze --interval 2 | tee /tmp/reports2.txt
+          grep -F "RR every 2 s: lowest Opus 16.3 kb/s, first reached at 36 s; at 60 s, when the loss stops, 16.3 kb/s with 7.0% reported loss; 158 packets lost in all; back at 32 kb/s 18 s later" /tmp/reports2.txt
+          python backoff_sim.py --reports squeeze --interval 5 --frame 60 | tee /tmp/reports60.txt
+          grep -F "RR every 5 s: lowest Opus 26.5 kb/s, first reached at 40 s; at 60 s, when the loss stops, 26.5 kb/s with 5.5% reported loss; 45 packets lost in all; back at 32 kb/s 20 s later" /tmp/reports60.txt
+          python backoff_sim.py --reports radio --interval 1 --loss 0 | tee /tmp/reportsnone.txt
+          grep -F "first decrease: none" /tmp/reportsnone.txt
+          grep -F "50 packets lost in all; never below 32 kb/s" /tmp/reportsnone.txt
+      - name: A live call's reports carry exactly the injected loss, and a round trip near 60 ms
+        # aiortc spaces its reports at random, so the counts and times differ between runs. The script asserts the
+        # per-report loss match itself; the round trip is checked here against a band wide enough for a shared runner.
+        timeout-minutes: 3
+        run: |
+          python capture_call.py | tee /tmp/call.txt
+          grep -E "Every RR's new losses matched the packets dropped in its interval: ([0-9]+) of \1\." /tmp/call.txt
+          python - <<'PY'
+          import re
+          text = open("/tmp/call.txt").read()
+          lo, hi = map(float, re.search(r"real send time: ([\d.]+) to ([\d.]+) ms", text).groups())
+          assert 59.5 <= lo and hi <= 90, (lo, hi)
+          print(f"round trip {lo} to {hi} ms, against the 60 ms the hook adds")
+          PY

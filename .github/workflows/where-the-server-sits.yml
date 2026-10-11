@@ -1,0 +1,66 @@
+name: where-the-server-sits
+# Runs only when this post's folder changes, and fails if the demo stops printing what the post quotes.
+on:
+  push:
+    paths: ["where-the-server-sits/**", ".github/workflows/where-the-server-sits.yml"]
+  pull_request:
+    paths: ["where-the-server-sits/**", ".github/workflows/where-the-server-sits.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: where-the-server-sits
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The arithmetic prints the numbers the post quotes
+        # Standard library only, so this runs before anything is installed.
+        run: |
+          python topology_cost.py | tee /tmp/cost.txt
+          grep -F "80 B Opus + 12 B RTP + 8 B UDP + 20 B IPv4 = 120 B, 50 packets/s = 48 kb/s" /tmp/cost.txt
+          grep -E "^  mesh +96 +96 +- +- +-$" /tmp/cost.txt
+          grep -E "^  SFU +48 +96 +144 +288 +300$" /tmp/cost.txt
+          grep -E "^  MCU +48 +48 +144 +144 +150$" /tmp/cost.txt
+          grep -E "^  SFU +1 +1 +2 +2 +1 +3 +0 +0 +0 +6$" /tmp/cost.txt
+          grep -E "^  MCU +1 +1 +1 +1 +0 +3 +3 +3 +3 +3$" /tmp/cost.txt
+          grep -E "^  mesh +432 +432 +- +- +-$" /tmp/cost.txt
+          grep -E "^  SFU +48 +432 +480 +4320 +4500$" /tmp/cost.txt
+          grep -E "^  SFU, 3 loudest +48 +144 +480 +1296 +1350$" /tmp/cost.txt
+          grep -E "^  SFU +1 +1 +9 +9 +1 +10 +0 +0 +0 +90$" /tmp/cost.txt
+          grep -E "^  server is the peer +48 +48 +48 +48 +50$" /tmp/cost.txt
+          grep -F "130 B = 52 kb/s per stream with AES128_CM_HMAC_SHA1_80 (10 B), 136 B = 54.4 kb/s" /tmp/cost.txt
+          python topology_cost.py -n 3 --srtp-tag 10 --audio-level | grep -F "= 138 B, 50 packets/s = 55.2 kb/s"
+      - name: The counts follow from the formulas, checked independently
+        run: |
+          python - <<'PY'
+          import topology_cost as t
+          for n in range(2, 31):
+              m, s, x = t.mesh(n), t.sfu(n), t.mcu(n)
+              assert (m.up, m.down, m.client.protect) == (n - 1, n - 1, n - 1)
+              assert (s.up, s.down, s.server_in, s.server_out) == (1, n - 1, n, n * (n - 1))
+              assert (s.server.unprotect, s.server.protect, s.server.decode, s.server.encode) == (n, n * (n - 1), 0, 0)
+              assert (x.up, x.down, x.server_in, x.server_out) == (1, 1, n, n)
+              assert (x.server.decode, x.server.encode, x.server.protect) == (n, n, n)
+              for k in range(1, n + 1):
+                  sk = t.sfu(n, k)
+                  assert sk.server_out == k * (n - 1) and sk.down == min(k, n - 1)
+          print("mesh, SFU and MCU match N-1, N(N-1) and N for N = 2 to 30")
+          PY
+      - run: pip install -r requirements.txt
+      - name: The measurement runs, and the MCU costs far more than the SFU
+        # Timings differ between machines, so only the shape is checked: the margin is loose on purpose.
+        run: |
+          python measure.py --seconds 5 | tee /tmp/measure.txt
+          grep -F "312 samples = 6.5 ms here" /tmp/measure.txt
+          python - <<'PY'
+          import re
+          rows = re.findall(r"^\s+(\d+)\s+(\d+) \(\s*\d+\)\s+(\d+) \(\s*\d+\)", open("/tmp/measure.txt").read(), re.M)
+          assert [r[0] for r in rows] == ["3", "5", "10"], rows
+          for n, mcu, sfu in rows:
+              assert int(mcu) > 20 * max(int(sfu), 1), (n, mcu, sfu)
+          print("MCU over SFU:", ", ".join(f"N={n} {int(m) / max(int(s), 1):.0f}x" for n, m, s in rows))
+          PY

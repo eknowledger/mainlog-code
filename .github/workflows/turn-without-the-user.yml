@@ -1,0 +1,37 @@
+name: turn-without-the-user
+# The runtime behind two posts. Runs only when its folder changes: the tests, then a check that runs.json, every
+# scenario's recorded log, is current. The posts quote those logs and their replay labs show them, so a runtime change
+# that alters any log fails here until runs.json is regenerated and the posts are checked against it.
+on:
+  push:
+    paths: ["turn-without-the-user/**", ".github/workflows/turn-without-the-user.yml"]
+  pull_request:
+    paths: ["turn-without-the-user/**", ".github/workflows/turn-without-the-user.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]   # the two versions the runtime was tested on
+    defaults:
+      run:
+        working-directory: turn-without-the-user
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pytest==8.3.5
+      - run: python -m pytest -q tests
+      - name: The replay labs' recorded runs are current
+        run: |
+          cp runs.json /tmp/runs.before.json
+          python export_runs.py
+          diff /tmp/runs.before.json runs.json
+      - name: The logs the posts quote
+        run: |
+          python -m agent_runtime.demo offer | grep -F "16  turn.start        T2 origin=restaurant"
+          python -m agent_runtime.demo offer-as-user | grep -F "16  turn.start        T2 origin=user"
+          python -m agent_runtime.demo revise-in-flight-naive | grep -F "-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)"
+          python -m agent_runtime.demo revise-in-flight | grep -F "-- restaurant holds: R2 (Sat 19:00)"

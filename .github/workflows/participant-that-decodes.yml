@@ -1,0 +1,32 @@
+name: participant-that-decodes
+# Runs only when this post's folder changes. Runs the tests, then checks each demo still prints the lines the post
+# quotes, so the post and the code can't drift apart.
+on:
+  push:
+    paths: ["participant-that-decodes/**", ".github/workflows/participant-that-decodes.yml"]
+  pull_request:
+    paths: ["participant-that-decodes/**", ".github/workflows/participant-that-decodes.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.13"]
+    defaults:
+      run:
+        working-directory: participant-that-decodes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pytest==8.3.5
+      - run: python -m pytest -q tests
+      - name: The demos print what the post quotes
+        run: |
+          python -m call_topology.demo forward --speaker Chloe | grep -F "Chloe seq 5202 -> 5201  ts 1920"
+          python -m call_topology.demo loss | grep -F "Ana   seq 5001          lost on the network"
+          python -m call_topology.demo mix | grep -F "mixer decodes: 4, encodes: 4"
+          python -m call_topology.demo keys | grep -F "agent with the wrong key:  wrong key: this box is not one of the ends"
+          python -m call_topology.counts --people 3 | grep -F "| Decodes in the whole call | 12 | 8 | 6 |"

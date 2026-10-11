@@ -1,0 +1,3 @@
+aiortc==1.15.0
+pylibsrtp==1.0.0
+cryptography==50.0.2

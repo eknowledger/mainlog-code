@@ -1,0 +1,1367 @@
+== offer
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+-- restaurant holds: nothing
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Book a table for 4 on Fri at 20:30; then text group: "table for 4, Fri 20:30". Approve within 10 minutes?
+== offer-approve
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             user: yes
+20  approval          A1: runs exactly its 2 step(s)
+21  turn.start        T3 origin=user
+22  tool.sent         T3 reserve_table(Fri, 20:30, 4) key=s1:op-a4
+23  restaurant        committed R2 Fri 20:30 x4
+24  tool.result       T3 reserve_table -> R2
+25  tool.sent         T3 text_group(group, table for 4, Fri 20:30)
+26  messages          delivered to group: 'table for 4, Fri 20:30'
+27  tool.result       T3 text_group -> M2
+28  turn.end          T3
+-- restaurant holds: R2 (Fri 20:30)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 4, Fri 20:30'
+-- agent's last message: Booked Fri 20:30 for 4 (R2). Texted group.
+== offer-stale-approval
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             user: yes
+20  approval.rejected A1: expired (asked at m0, now m15)
+-- restaurant holds: nothing
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: I can't use that approval (A1): expired (asked at m0, now m15).
+== offer-approve-twice
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             user: yes
+20  approval          A1: runs exactly its 2 step(s)
+21  turn.start        T3 origin=user
+22  tool.sent         T3 reserve_table(Fri, 20:30, 4) key=s1:op-a4
+23  restaurant        committed R2 Fri 20:30 x4
+24  tool.result       T3 reserve_table -> R2
+25  tool.sent         T3 text_group(group, table for 4, Fri 20:30)
+26  messages          delivered to group: 'table for 4, Fri 20:30'
+27  tool.result       T3 text_group -> M2
+28  turn.end          T3
+29  input             user: yes
+30  approval.rejected A1: already used
+-- restaurant holds: R2 (Fri 20:30)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 4, Fri 20:30'
+-- agent's last message: I can't use that approval (A1): already used.
+== offer-approved-by-webhook
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             restaurant: yes [evt_18]
+20  input.persisted   evt_18; now acknowledged
+21  approval.rejected A1: approvals come only from the user, not from restaurant
+-- restaurant holds: nothing
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Book a table for 4 on Fri at 20:30; then text group: "table for 4, Fri 20:30". Approve within 10 minutes?
+== offer-rebook
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             user: book Friday 19:00 for 4 and tell the group
+20  turn.start        T3 origin=user
+21  tool.sent         T3 check_availability(Fri, 19:00, 4)
+22  tool.result       T3 check_availability -> available
+23  tool.sent         T3 reserve_table(Fri, 19:00, 4) key=s1:op-a5
+24  restaurant        committed R2 Fri 19:00 x4
+25  tool.result       T3 reserve_table -> R2
+26  tool.sent         T3 text_group(group, table for 4, Fri 19:00)
+27  messages          delivered to group: 'table for 4, Fri 19:00'
+28  tool.result       T3 text_group -> M2
+29  turn.end          T3
+-- restaurant holds: R2 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R2). Texted group.
+== approval-during-turn
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.result       T1 reserve_table -> R1
+ 8  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+ 9  messages          delivered to group: 'table for 4, Fri 19:00'
+10  tool.result       T1 text_group -> M1
+11  turn.end          T1
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             user: book Saturday 12:00 for 2
+20  turn.start        T3 origin=user
+21  tool.sent         T3 check_availability(Sat, 12:00, 2)
+22  tool.result       T3 check_availability -> available
+23  tool.sent         T3 reserve_table(Sat, 12:00, 2) key=s1:op-a5
+24  restaurant        committed R2 Sat 12:00 x2
+25  input             user: yes
+26  approval          A1: queued until T3 ends
+27  tool.result       T3 reserve_table -> R2
+28  turn.end          T3
+29  approval          A1: runs exactly its 2 step(s)
+30  turn.start        T4 origin=user
+31  tool.sent         T4 reserve_table(Fri, 20:30, 4) key=s1:op-a6
+32  restaurant        committed R3 Fri 20:30 x4
+33  tool.result       T4 reserve_table -> R3
+34  tool.sent         T4 text_group(group, table for 4, Fri 20:30)
+35  messages          delivered to group: 'table for 4, Fri 20:30'
+36  tool.result       T4 text_group -> M2
+37  turn.end          T4
+-- restaurant holds: R2 (Sat 12:00), R3 (Fri 20:30)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 4, Fri 20:30'
+-- agent's last message: Booked Fri 20:30 for 4 (R3). Texted group.
+== offer-as-user
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=user
+17  tool.sent         T2 reserve_table(Fri, 20:30, 4) key=s1:op-a4
+18  restaurant        committed R2 Fri 20:30 x4
+19  tool.result       T2 reserve_table -> R2
+20  tool.sent         T2 text_group(group, table for 4, Fri 20:30)
+21  messages          delivered to group: 'table for 4, Fri 20:30'
+22  tool.result       T2 text_group -> M2
+23  turn.end          T2
+-- restaurant holds: R2 (Fri 20:30)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 4, Fri 20:30'
+-- agent's last message: Booked Fri 20:30 for 4 (R2). Texted group.
+== offer-as-user-origin
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+-- restaurant holds: nothing
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Book a table for 4 on Fri at 20:30; then text group: "table for 4, Fri 20:30". Approve within 10 minutes?
+== offer-hostile-model-question
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+19  input             user: yes
+20  approval          A1: runs exactly its 2 step(s)
+21  turn.start        T3 origin=user
+22  tool.sent         T3 reserve_table(Fri, 20:30, 12) key=s1:op-a4
+23  restaurant        committed R2 Fri 20:30 x12
+24  tool.result       T3 reserve_table -> R2
+25  tool.sent         T3 text_group(group, table for 12, Fri 20:30)
+26  messages          delivered to group: 'table for 12, Fri 20:30'
+27  tool.result       T3 text_group -> M2
+28  turn.end          T3
+-- restaurant holds: R2 (Fri 20:30)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 12, Fri 20:30'
+-- agent's last message: Booked Fri 20:30 for 12 (R2). Texted group.
+== offer-hostile
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.persisted   evt_17; now acknowledged
+15  effect.gone       R1: reported by restaurant
+16  turn.start        T2 origin=restaurant
+17  turn.ask          T2: A1 needs the user's consent
+18  turn.end          T2
+-- restaurant holds: nothing
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Book a table for 12 on Fri at 20:30; then text group: "table for 12, Fri 20:30". Approve within 10 minutes?
+== during-merge
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: also tell Sam
+ 8  model.read        adds T1: notify=('Sam',)
+ 9  input.held        until T1's next step
+10  tool.result       T1 reserve_table -> R1
+11  input.merged      T1 now: book Fri 19:00 for 4, tell group and Sam
+12  tool.sent         T1 text_group(group and Sam, table for 4, Fri 19:00)
+13  messages          delivered to group and Sam: 'table for 4, Fri 19:00'
+14  tool.result       T1 text_group -> M1
+15  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00)
+-- group and Sam received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group and Sam.
+== during-merge-from-webhook
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             restaurant: also tell Sam [evt_40]
+ 8  input.persisted   evt_40; now acknowledged
+ 9  input.queued      behind T1: from restaurant; T1's origin is user
+10  tool.result       T1 reserve_table -> R1
+11  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+12  messages          delivered to group: 'table for 4, Fri 19:00'
+13  tool.result       T1 text_group -> M1
+14  turn.end          T1
+15  turn.start        T2 origin=restaurant
+16  turn.ask          T2: A1 needs the user's consent
+17  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Text Sam: "table for 4, Fri 19:00". Approve within 10 minutes?
+== during-queue
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: also tell Sam
+ 8  model.read        adds T1: notify=('Sam',)
+ 9  input.queued      behind T1
+10  tool.result       T1 reserve_table -> R1
+11  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+12  messages          delivered to group: 'table for 4, Fri 19:00'
+13  tool.result       T1 text_group -> M1
+14  turn.end          T1
+15  turn.start        T2 origin=user
+16  tool.sent         T2 text_group(Sam, table for 4, Fri 19:00)
+17  messages          delivered to Sam: 'table for 4, Fri 19:00'
+18  tool.result       T2 text_group -> M2
+19  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- Sam received: 'table for 4, Fri 19:00'
+-- agent's last message: Texted Sam.
+== during-reject
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: also tell Sam
+ 8  model.read        adds T1: notify=('Sam',)
+ 9  input.rejected    T1 is still running; told the user
+10  tool.result       T1 reserve_table -> R1
+11  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+12  messages          delivered to group: 'table for 4, Fri 19:00'
+13  tool.result       T1 text_group -> M1
+14  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group.
+== during-interrupt-turn-keys
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=T1:reserve_table
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: also tell Sam
+ 8  model.read        adds T1: notify=('Sam',)
+ 9  tool.unknown      T1 reserve_table: stopped waiting
+10  turn.cancelled    T1; restarting
+11  turn.start        T2 origin=user
+12  tool.sent         T2 check_availability(Fri, 19:00, 4)
+13  tool.result       T2 check_availability -> available
+14  tool.sent         T2 reserve_table(Fri, 19:00, 4) key=T2:reserve_table
+15  restaurant        committed R2 Fri 19:00 x4
+16  tool.result       T2 reserve_table -> R2
+17  tool.sent         T2 text_group(group and Sam, table for 4, Fri 19:00)
+18  messages          delivered to group and Sam: 'table for 4, Fri 19:00'
+19  tool.result       T2 text_group -> M1
+20  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- group and Sam received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R2). Texted group and Sam.
+== during-interrupt
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: also tell Sam
+ 8  model.read        adds T1: notify=('Sam',)
+ 9  tool.unknown      T1 reserve_table: stopped waiting
+10  turn.cancelled    T1; restarting
+11  turn.start        T2 origin=user
+12  tool.sent         T2 check_availability(Fri, 19:00, 4)
+13  tool.result       T2 check_availability -> available
+14  tool.sent         T2 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+15  restaurant        replayed R1 for key s1:op-a2
+16  tool.result       T2 reserve_table -> R1
+17  tool.sent         T2 text_group(group and Sam, table for 4, Fri 19:00)
+18  messages          delivered to group and Sam: 'table for 4, Fri 19:00'
+19  tool.result       T2 text_group -> M1
+20  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- group and Sam received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group and Sam.
+== busy
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             timer: pick up Ana at 18:00
+ 8  messages          delivered to you: 'Leave now to pick up Ana at 18:00'
+ 9  notice.sent       now: 'Leave now to pick up Ana at 18:00'
+10  input             cinema: 17:00 screening cancelled [evt_31]
+11  input.persisted   evt_31; now acknowledged
+12  messages          delivered to you: 'The 17:00 screening is cancelled; your tickets are refunded'
+13  notice.sent       now: 'The 17:00 screening is cancelled; your tickets are refunded'
+14  input             cinema: 17:00 screening cancelled [evt_31]
+15  input.dropped     duplicate delivery of evt_31
+16  input             restaurant: your Fri 19:00 table is cancelled [evt_99]
+17  input.rejected    signature doesn't match restaurant's secret
+18  input             timer: leave for the 17:00 film
+19  input.superseded  "leave for the 17:00 film": film is already moot
+20  tool.result       T1 reserve_table -> R1
+21  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+22  messages          delivered to group: 'table for 4, Fri 19:00'
+23  tool.result       T1 text_group -> M3
+24  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00)
+-- you received: 'Leave now to pick up Ana at 18:00'
+-- you received: 'The 17:00 screening is cancelled; your tickets are refunded'
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group.
+== busy-boundary
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             timer: pick up Ana at 18:00
+ 8  input.held        notice for T1's next step (deadline m5)
+ 9  input             cinema: 17:00 screening cancelled [evt_31]
+10  input.persisted   evt_31; now acknowledged
+11  input.held        notice for T1's next step
+12  input             cinema: 17:00 screening cancelled [evt_31]
+13  input.dropped     duplicate delivery of evt_31
+14  input             restaurant: your Fri 19:00 table is cancelled [evt_99]
+15  input.rejected    signature doesn't match restaurant's secret
+16  input             timer: leave for the 17:00 film
+17  input.superseded  "leave for the 17:00 film": film is already moot
+18  tool.result       T1 reserve_table -> R1
+19  messages          delivered to you: 'Leave now to pick up Ana at 18:00'
+20  notice.sent       at T1's boundary: 'Leave now to pick up Ana at 18:00'
+21  messages          delivered to you: 'The 17:00 screening is cancelled; your tickets are refunded'
+22  notice.sent       at T1's boundary: 'The 17:00 screening is cancelled; your tickets are refunded'
+23  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+24  messages          delivered to group: 'table for 4, Fri 19:00'
+25  tool.result       T1 text_group -> M3
+26  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00)
+-- you received: 'Leave now to pick up Ana at 18:00'
+-- you received: 'The 17:00 screening is cancelled; your tickets are refunded'
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group.
+== busy-queue-only
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             timer: pick up Ana at 18:00
+ 8  input.queued      behind T1, deadline m5
+ 9  input             cinema: 17:00 screening cancelled [evt_31]
+10  input.persisted   evt_31; now acknowledged
+11  input.queued      behind T1
+12  input             cinema: 17:00 screening cancelled [evt_31]
+13  input.dropped     duplicate delivery of evt_31
+14  input             restaurant: your Fri 19:00 table is cancelled [evt_99]
+15  input.rejected    signature doesn't match restaurant's secret
+16  input             timer: leave for the 17:00 film
+17  input.superseded  "leave for the 17:00 film": film is already moot
+18  tool.result       T1 reserve_table -> R1
+19  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+20  messages          delivered to group: 'table for 4, Fri 19:00'
+21  tool.result       T1 text_group -> M1
+22  turn.end          T1
+23  input.expired     "pick up Ana at 18:00" (deadline m5, now m8)
+24  turn.start        T2 origin=cinema
+25  tool.sent         T2 notify_user(The 17:00 screening is cancelled; your tickets are refunded)
+26  messages          delivered to you: 'The 17:00 screening is cancelled; your tickets are refunded'
+27  tool.result       T2 notify_user -> M2
+28  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- you received: 'The 17:00 screening is cancelled; your tickets are refunded'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group.
+== notice-last-step
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.result       T1 reserve_table -> R1
+ 8  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+ 9  messages          delivered to group: 'table for 4, Fri 19:00'
+10  input             timer: parcel delivered
+11  input.held        notice for T1's next step
+12  tool.result       T1 text_group -> M1
+13  messages          delivered to you: 'Your parcel was delivered'
+14  notice.sent       at T1's boundary: 'Your parcel was delivered'
+15  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- you received: 'Your parcel was delivered'
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texted group.
+== tampered-and-replayed
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.result       T1 reserve_table -> R1
+ 8  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+ 9  messages          delivered to group: 'table for 4, Fri 19:00'
+10  tool.result       T1 text_group -> M1
+11  turn.end          T1
+12  restaurant        cancelled R1
+13  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_17]
+14  input.rejected    signature doesn't match restaurant's secret
+15  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_18]
+16  input.persisted   evt_18; now acknowledged
+17  effect.gone       R1: reported by restaurant
+18  turn.start        T2 origin=restaurant
+19  turn.ask          T2: A1 needs the user's consent
+20  turn.end          T2
+21  input             restaurant: your Fri 19:00 table is gone; 20:30 is free [evt_18]
+22  input.rejected    signed at m0, now m5760: outside the 5-minute tolerance
+-- restaurant holds: nothing
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Book a table for 4 on Fri at 20:30; then text group: "table for 4, Fri 20:30". Approve within 10 minutes?
+== crash-after-ack
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             restaurant: a Saturday 12:00 table for 2 opened up [evt_50]
+ 8  input.persisted   evt_50; now acknowledged
+ 9  crash             process killed
+10  restart           1 operation(s) in the log
+11  resolve           s1:op-a2: R1; key closed
+12  turn.resume       T1 origin=user
+13  replay            evt_50: acknowledged, not yet acted on
+14  tool.sent         T1 check_availability(Fri, 19:00, 4)
+15  input.queued      behind T1: from restaurant; T1's origin is user
+16  tool.result       T1 check_availability -> available
+17  skip              reserve_table: op-a2 already committed as R1
+18  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+19  messages          delivered to group: 'table for 4, Fri 19:00'
+20  tool.result       T1 text_group -> M1
+21  turn.end          T1
+22  turn.start        T2 origin=restaurant
+23  turn.ask          T2: A1 needs the user's consent
+24  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- agent's last message: A1 (from restaurant): Book a table for 2 on Sat at 12:00. Approve within 10 minutes?
+== revise-early
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  input             user: actually, Saturday
+ 5  model.read        revises T1: day=Sat
+ 6  intent.revised    T1: day Fri -> Sat
+ 7  tool.cancelled    T1 check_availability: stopped waiting
+ 8  dropped           2 planned step(s) of T1 never started
+ 9  turn.start        T2 origin=user
+10  tool.sent         T2 check_availability(Sat, 19:00, 4)
+11  tool.result       T2 check_availability -> available
+12  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a3
+13  restaurant        committed R1 Sat 19:00 x4
+14  tool.result       T2 reserve_table -> R1
+15  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+16  messages          delivered to group: 'table for 4, Sat 19:00'
+17  tool.result       T2 text_group -> M1
+18  turn.end          T2
+-- restaurant holds: R1 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R1). Texted group.
+== revise-in-flight-naive
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  tool.cancelled    T1 reserve_table: stopped waiting
+10  turn.cancelled    T1; restarting
+11  turn.start        T2 origin=user
+12  tool.sent         T2 check_availability(Sat, 19:00, 4)
+13  tool.result       T2 check_availability -> available
+14  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+15  restaurant        committed R2 Sat 19:00 x4
+16  tool.result       T2 reserve_table -> R2
+17  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+18  messages          delivered to group: 'table for 4, Sat 19:00'
+19  tool.result       T2 text_group -> M1
+20  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Texted group.
+== revise-in-flight
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate        R1: the replacement holds
+21  tool.sent         T2 cancel_reservation(R1)
+22  restaurant        cancelled R1
+23  tool.result       T2 cancel_reservation -> R1
+24  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+25  messages          delivered to group: 'table for 4, Sat 19:00'
+26  tool.result       T2 text_group -> M1
+27  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group.
+== revise-in-flight-wait
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  waiting           for reserve_table to finish
+11  tool.result       T1 reserve_table -> R1
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate        R1: the replacement holds
+21  tool.sent         T2 cancel_reservation(R1)
+22  restaurant        cancelled R1
+23  tool.result       T2 cancel_reservation -> R1
+24  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+25  messages          delivered to group: 'table for 4, Sat 19:00'
+26  tool.result       T2 text_group -> M1
+27  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group.
+== revise-late-arrival-unfenced
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  input             user: actually, Saturday
+ 7  model.read        revises T1: day=Sat
+ 8  intent.revised    T1: day Fri -> Sat
+ 9  tool.unknown      T1 reserve_table: stopped waiting
+10  resolve           s1:op-a2: nothing has landed
+11  dropped           1 planned step(s) of T1 never started
+12  turn.start        T2 origin=user
+13  tool.sent         T2 check_availability(Sat, 19:00, 4)
+14  tool.result       T2 check_availability -> available
+15  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+16  restaurant        committed R1 Sat 19:00 x4
+17  tool.result       T2 reserve_table -> R1
+18  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+19  messages          delivered to group: 'table for 4, Sat 19:00'
+20  tool.result       T2 text_group -> M1
+21  turn.end          T2
+22  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Sat 19:00), R2 (Fri 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R1). Texted group.
+== revise-late-arrival
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  input             user: actually, Saturday
+ 7  model.read        revises T1: day=Sat
+ 8  intent.revised    T1: day Fri -> Sat
+ 9  tool.unknown      T1 reserve_table: stopped waiting
+10  resolve           s1:op-a2: nothing has landed; key closed
+11  dropped           1 planned step(s) of T1 never started
+12  turn.start        T2 origin=user
+13  tool.sent         T2 check_availability(Sat, 19:00, 4)
+14  tool.result       T2 check_availability -> available
+15  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+16  restaurant        committed R1 Sat 19:00 x4
+17  tool.result       T2 reserve_table -> R1
+18  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+19  messages          delivered to group: 'table for 4, Sat 19:00'
+20  tool.result       T2 text_group -> M1
+21  turn.end          T2
+22  restaurant        refused a late request: key s1:op-a2 is closed
+-- restaurant holds: R1 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R1). Texted group.
+== revise-time
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, make it 20:00
+ 8  model.read        revises T1: time=20:00
+ 9  intent.revised    T1: time 19:00 -> 20:00
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Fri, 20:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Fri, 20:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Fri 20:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate        R1: the replacement holds
+21  tool.sent         T2 cancel_reservation(R1)
+22  restaurant        cancelled R1
+23  tool.result       T2 cancel_reservation -> R1
+24  tool.sent         T2 text_group(group, table for 4, Fri 20:00)
+25  messages          delivered to group: 'table for 4, Fri 20:00'
+26  tool.result       T2 text_group -> M1
+27  turn.end          T2
+-- restaurant holds: R2 (Fri 20:00)
+-- group received: 'table for 4, Fri 20:00'
+-- agent's last message: Booked Fri 20:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group.
+== revise-keep
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, just tell Sam, not the group
+ 8  model.read        revises T1: notify=('Sam',)
+ 9  intent.revised    T1: notify ('group',) -> ('Sam',)
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  keep              R1: day, time and party still match
+14  turn.start        T2 origin=user
+15  skip              reserve_table: R1 already matches
+16  tool.sent         T2 text_group(Sam, table for 4, Fri 19:00)
+17  messages          delivered to Sam: 'table for 4, Fri 19:00'
+18  tool.result       T2 text_group -> M1
+19  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- Sam received: 'table for 4, Fri 19:00'
+-- agent's last message: Kept R1 (Fri 19:00); it already matches. Texted Sam.
+== revise-unsure
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: Saturday too?
+ 8  model.read        unsure T1: day=Sat
+ 9  input.unsure      T1 stops at its next step until the user answers
+10  tool.result       T1 reserve_table -> R1
+11  turn.paused       T1 before text_group
+12  input             user: instead
+13  model.read        answer to T1: instead
+14  intent.revised    T1: day Fri -> Sat
+15  dropped           1 planned step(s) of T1 never started
+16  release           R1 once the replacement holds
+17  turn.start        T2 origin=user
+18  tool.sent         T2 check_availability(Sat, 19:00, 4)
+19  tool.result       T2 check_availability -> available
+20  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+21  restaurant        committed R2 Sat 19:00 x4
+22  tool.result       T2 reserve_table -> R2
+23  compensate        R1: the replacement holds
+24  tool.sent         T2 cancel_reservation(R1)
+25  restaurant        cancelled R1
+26  tool.result       T2 cancel_reservation -> R1
+27  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+28  messages          delivered to group: 'table for 4, Sat 19:00'
+29  tool.result       T2 text_group -> M1
+30  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group.
+== two-revisions
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  input             user: actually, Sunday
+17  model.read        revises T2: day=Sun
+18  intent.revised    T2: day Sat -> Sun
+19  tool.cancelled    T2 check_availability: stopped waiting
+20  dropped           2 planned step(s) of T2 never started
+21  release           R1 once the replacement holds
+22  turn.start        T3 origin=user
+23  tool.sent         T3 check_availability(Sun, 19:00, 4)
+24  tool.result       T3 check_availability -> available
+25  tool.sent         T3 reserve_table(Sun, 19:00, 4) key=s1:op-a5
+26  restaurant        committed R2 Sun 19:00 x4
+27  tool.result       T3 reserve_table -> R2
+28  compensate        R1: the replacement holds
+29  tool.sent         T3 cancel_reservation(R1)
+30  restaurant        cancelled R1
+31  tool.result       T3 cancel_reservation -> R1
+32  tool.sent         T3 text_group(group, table for 4, Sun 19:00)
+33  messages          delivered to group: 'table for 4, Sun 19:00'
+34  tool.result       T3 text_group -> M1
+35  turn.end          T3
+-- restaurant holds: R2 (Sun 19:00)
+-- group received: 'table for 4, Sun 19:00'
+-- agent's last message: Booked Sun 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group.
+== keep-then-revise
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, just tell Sam, not the group
+ 8  model.read        revises T1: notify=('Sam',)
+ 9  intent.revised    T1: notify ('group',) -> ('Sam',)
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  keep              R1: day, time and party still match
+14  turn.start        T2 origin=user
+15  skip              reserve_table: R1 already matches
+16  tool.sent         T2 text_group(Sam, table for 4, Fri 19:00)
+17  messages          delivered to Sam: 'table for 4, Fri 19:00'
+18  input             user: actually, Saturday
+19  model.read        revises T2: day=Sat
+20  intent.revised    T2: day Fri -> Sat
+21  waiting           for text_group, up to 50 ms
+22  tool.result       T2 text_group -> M1
+23  irreversible      Sam already has 'table for 4, Fri 19:00'; the new plan corrects it
+24  release           R1 once the replacement holds
+25  turn.start        T3 origin=user
+26  tool.sent         T3 check_availability(Sat, 19:00, 4)
+27  tool.result       T3 check_availability -> available
+28  tool.sent         T3 reserve_table(Sat, 19:00, 4) key=s1:op-a5
+29  restaurant        committed R2 Sat 19:00 x4
+30  tool.result       T3 reserve_table -> R2
+31  compensate        R1: the replacement holds
+32  tool.sent         T3 cancel_reservation(R1)
+33  restaurant        cancelled R1
+34  tool.result       T3 cancel_reservation -> R1
+35  tool.sent         T3 text_group(Sam, Change of plan: table for 4, Sat 19:00)
+36  messages          delivered to Sam: 'Change of plan: table for 4, Sat 19:00'
+37  tool.result       T3 text_group -> M2
+38  turn.end          T3
+-- restaurant holds: R2 (Sat 19:00)
+-- Sam received: 'table for 4, Fri 19:00'
+-- Sam received: 'Change of plan: table for 4, Sat 19:00'
+-- agent's last message: The earlier text had already gone out. Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted Sam a correction.
+== revise-full
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> full
+17  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Sat 19:00 is full. You still hold R1 (Fri 19:00); keep it, or shall I cancel it?
+== revise-full-old-first
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  compensate        R1: before securing a replacement
+14  tool.sent         T2 cancel_reservation(R1)
+15  restaurant        cancelled R1
+16  tool.result       T2 cancel_reservation -> R1
+17  turn.start        T2 origin=user
+18  tool.sent         T2 check_availability(Sat, 19:00, 4)
+19  tool.result       T2 check_availability -> full
+20  turn.end          T2
+-- restaurant holds: nothing
+-- agent's last message: Cancelled R1 (Fri 19:00). Sat 19:00 is full.
+== revise-fee
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate.ask    cancelling R1 costs a 20 fee: A1 needs the user's consent
+21  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+22  messages          delivered to group: 'table for 4, Sat 19:00'
+23  tool.result       T2 text_group -> M1
+24  turn.end          T2
+25  input             user: yes
+26  approval          A1: runs exactly its 1 step(s)
+27  turn.start        T3 origin=user
+28  tool.sent         T3 cancel_reservation(R1, 20)
+29  restaurant        cancelled R1 (fee 20)
+30  tool.result       T3 cancel_reservation -> R1
+31  turn.end          T3
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Cancelled R1 (Fri 19:00), fee 20.
+== revise-fee-rises
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate.ask    cancelling R1 costs a 20 fee: A1 needs the user's consent
+21  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+22  messages          delivered to group: 'table for 4, Sat 19:00'
+23  tool.result       T2 text_group -> M1
+24  turn.end          T2
+25  input             user: yes
+26  approval          A1: runs exactly its 1 step(s)
+27  turn.start        T3 origin=user
+28  tool.sent         T3 cancel_reservation(R1, 20)
+29  restaurant        refused to cancel R1: the fee is 80, above the 20 agreed
+30  tool.failed       T3 cancel_reservation: the fee is now 80, above the approved 20
+31  compensate.ask    cancelling R1 costs a 80 fee: A2 needs the user's consent
+32  turn.end          T3
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Cancelling R1 (Fri 19:00) now costs a 80 fee. Approve A2 to cancel it anyway, or keep it.
+== revise-fee-declined
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate.ask    cancelling R1 costs a 20 fee: A1 needs the user's consent
+21  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+22  messages          delivered to group: 'table for 4, Sat 19:00'
+23  tool.result       T2 text_group -> M1
+24  turn.end          T2
+25  input             user: no, keep it
+26  approval.declined A1
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Kept R1 (Fri 19:00).
+== revise-refused
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate.failed R1: the restaurant won't cancel inside its window
+21  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+22  messages          delivered to group: 'table for 4, Sat 19:00'
+23  tool.result       T2 text_group -> M1
+24  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). The restaurant won't cancel R1 (Fri 19:00) this close to the booking, so you still hold it. Texted group.
+== revise-after-text
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.result       T1 reserve_table -> R1
+ 8  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+ 9  messages          delivered to group: 'table for 4, Fri 19:00'
+10  input             user: actually, Saturday
+11  model.read        revises T1: day=Sat
+12  intent.revised    T1: day Fri -> Sat
+13  waiting           for text_group, up to 50 ms
+14  tool.result       T1 text_group -> M1
+15  irreversible      group already has 'table for 4, Fri 19:00'; the new plan corrects it
+16  release           R1 once the replacement holds
+17  turn.start        T2 origin=user
+18  tool.sent         T2 check_availability(Sat, 19:00, 4)
+19  tool.result       T2 check_availability -> available
+20  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a5
+21  restaurant        committed R2 Sat 19:00 x4
+22  tool.result       T2 reserve_table -> R2
+23  compensate        R1: the replacement holds
+24  tool.sent         T2 cancel_reservation(R1)
+25  restaurant        cancelled R1
+26  tool.result       T2 cancel_reservation -> R1
+27  tool.sent         T2 text_group(group, Change of plan: table for 4, Sat 19:00)
+28  messages          delivered to group: 'Change of plan: table for 4, Sat 19:00'
+29  tool.result       T2 text_group -> M2
+30  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'Change of plan: table for 4, Sat 19:00'
+-- agent's last message: The earlier text had already gone out. Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group a correction.
+== revise-after-text-no-receipt
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.result       T1 reserve_table -> R1
+ 8  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+ 9  messages          delivered to group: 'table for 4, Fri 19:00'
+10  input             user: actually, Saturday
+11  model.read        revises T1: day=Sat
+12  intent.revised    T1: day Fri -> Sat
+13  waiting           for text_group, up to 50 ms
+14  wait.expired      text_group: still no reply
+15  tool.unknown      T1 text_group: stopped waiting
+16  resolve           text_group: no reply, no lookup; treated as done
+17  irreversible      group already has 'table for 4, Fri 19:00'; the new plan corrects it
+18  release           R1 once the replacement holds
+19  turn.start        T2 origin=user
+20  tool.sent         T2 check_availability(Sat, 19:00, 4)
+21  tool.result       T2 check_availability -> available
+22  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a5
+23  restaurant        committed R2 Sat 19:00 x4
+24  tool.result       T2 reserve_table -> R2
+25  compensate        R1: the replacement holds
+26  tool.sent         T2 cancel_reservation(R1)
+27  restaurant        cancelled R1
+28  tool.result       T2 cancel_reservation -> R1
+29  tool.sent         T2 text_group(group, Change of plan: table for 4, Sat 19:00)
+30  messages          delivered to group: 'Change of plan: table for 4, Sat 19:00'
+31  tool.result       T2 text_group -> M2
+32  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'Change of plan: table for 4, Sat 19:00'
+-- agent's last message: The earlier text may already have reached them; I couldn't confirm it, so I've treated it as sent. Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group a correction.
+== revise-after-text-naive
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.result       T1 reserve_table -> R1
+ 8  tool.sent         T1 text_group(group, table for 4, Fri 19:00)
+ 9  messages          delivered to group: 'table for 4, Fri 19:00'
+10  input             user: actually, Saturday
+11  model.read        revises T1: day=Sat
+12  tool.cancelled    T1 text_group: stopped waiting
+13  turn.cancelled    T1; restarting
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a5
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+21  messages          delivered to group: 'table for 4, Sat 19:00'
+22  tool.result       T2 text_group -> M2
+23  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)
+-- group received: 'table for 4, Fri 19:00'
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Texted group.
+== revise-no-lookup
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4)
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  waiting           for reserve_table, up to 50 ms
+11  wait.expired      reserve_table: still no reply
+12  tool.unknown      T1 reserve_table: stopped waiting
+13  resolve           reserve_table: no reply, no lookup; outcome unknown
+14  dropped           1 planned step(s) of T1 never started
+15  turn.start        T2 origin=user
+16  tool.sent         T2 check_availability(Sat, 19:00, 4)
+17  tool.result       T2 check_availability -> available
+18  tool.sent         T2 reserve_table(Sat, 19:00, 4)
+19  restaurant        committed R2 Sat 19:00 x4
+20  tool.result       T2 reserve_table -> R2
+21  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+22  messages          delivered to group: 'table for 4, Sat 19:00'
+23  tool.result       T2 text_group -> M1
+24  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: I may have booked Fri 19:00: the restaurant never confirmed, and I can't check. If a confirmation arrives, tell me and I'll cancel it. Booked Sat 19:00 for 4 (R2). Texted group.
+== key-reuse-lenient
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:reserve_table
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:reserve_table: R1
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:reserve_table
+18  restaurant        replayed R1 for key s1:reserve_table
+19  tool.result       T2 reserve_table -> R1
+20  compensate        R1: the replacement holds
+21  tool.sent         T2 cancel_reservation(R1)
+22  restaurant        cancelled R1
+23  tool.result       T2 cancel_reservation -> R1
+24  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+25  messages          delivered to group: 'table for 4, Sat 19:00'
+26  tool.result       T2 text_group -> M1
+27  turn.end          T2
+-- restaurant holds: nothing
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R1). Cancelled R1 (Fri 19:00). Texted group.
+== key-reuse-strict
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:reserve_table
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:reserve_table: R1
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:reserve_table
+18  restaurant        rejected key s1:reserve_table: it was used for R1 Fri 19:00
+19  tool.failed       T2 reserve_table: KeyMismatch
+20  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: The restaurant rejected the Sat 19:00 request: its key was already used for another booking. You still hold R1 (Fri 19:00); keep it, or shall I cancel it?
+== lost-response
+ 1  input             user: book Friday 19:00 for 4
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.unknown      reserve_table: no reply; sending the same request again
+ 8  restaurant        replayed R1 for key s1:op-a2
+ 9  tool.result       T1 reserve_table -> R1
+10  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1).
+== lost-response-no-key
+ 1  input             user: book Friday 19:00 for 4
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4)
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  tool.unknown      reserve_table: no reply; sending the same request again
+ 8  restaurant        committed R2 Fri 19:00 x4
+ 9  tool.result       T1 reserve_table -> R2
+10  turn.end          T1
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R2).
+== crash-durable
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  crash             process killed
+20  restart           2 operation(s) in the log
+21  resolve           s1:op-a4: R2; key closed
+22  turn.resume       T2 origin=user
+23  tool.sent         T2 check_availability(Sat, 19:00, 4)
+24  tool.result       T2 check_availability -> available
+25  skip              reserve_table: op-a4 already committed as R2
+26  compensate        R1: the replacement holds
+27  tool.sent         T2 cancel_reservation(R1)
+28  restaurant        cancelled R1
+29  tool.result       T2 cancel_reservation -> R1
+30  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+31  messages          delivered to group: 'table for 4, Sat 19:00'
+32  tool.result       T2 text_group -> M1
+33  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group.
+== crash-in-memory
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  crash             process killed
+20  restart           0 operation(s) in the log
+21  turn.resume       T2 origin=user
+22  tool.sent         T2 check_availability(Sat, 19:00, 4)
+23  tool.result       T2 check_availability -> available
+24  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-b6
+25  restaurant        committed R3 Sat 19:00 x4
+26  tool.result       T2 reserve_table -> R3
+27  release.lost      op-a2: no record of it survived
+28  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+29  messages          delivered to group: 'table for 4, Sat 19:00'
+30  tool.result       T2 text_group -> M1
+31  turn.end          T2
+-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00), R3 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R3). Texted group.
+== crash-during-text
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate        R1: the replacement holds
+21  tool.sent         T2 cancel_reservation(R1)
+22  restaurant        cancelled R1
+23  tool.result       T2 cancel_reservation -> R1
+24  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+25  messages          delivered to group: 'table for 4, Sat 19:00'
+26  crash             process killed
+27  restart           4 operation(s) in the log
+28  resolve           text_group: no reply, no lookup; treated as done
+29  turn.resume       T2 origin=user
+30  tool.sent         T2 check_availability(Sat, 19:00, 4)
+31  tool.result       T2 check_availability -> available
+32  skip              reserve_table: op-a4 already committed as R2
+33  skip              text_group: op-a6 already assumed
+34  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Cancelled R1 (Fri 19:00). Texted group; I couldn't confirm delivery.
+== crash-during-cancel
+ 1  input             user: book Friday 19:00 for 4 and tell the group
+ 2  turn.start        T1 origin=user
+ 3  tool.sent         T1 check_availability(Fri, 19:00, 4)
+ 4  tool.result       T1 check_availability -> available
+ 5  tool.sent         T1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 6  restaurant        committed R1 Fri 19:00 x4
+ 7  input             user: actually, Saturday
+ 8  model.read        revises T1: day=Sat
+ 9  intent.revised    T1: day Fri -> Sat
+10  tool.unknown      T1 reserve_table: stopped waiting
+11  resolve           s1:op-a2: R1; key closed
+12  dropped           1 planned step(s) of T1 never started
+13  release           R1 once the replacement holds
+14  turn.start        T2 origin=user
+15  tool.sent         T2 check_availability(Sat, 19:00, 4)
+16  tool.result       T2 check_availability -> available
+17  tool.sent         T2 reserve_table(Sat, 19:00, 4) key=s1:op-a4
+18  restaurant        committed R2 Sat 19:00 x4
+19  tool.result       T2 reserve_table -> R2
+20  compensate        R1: the replacement holds
+21  tool.sent         T2 cancel_reservation(R1)
+22  restaurant        cancelled R1
+23  crash             process killed
+24  restart           3 operation(s) in the log
+25  resolve           cancel_reservation: no reply, no lookup; treated as done
+26  turn.resume       T2 origin=user
+27  tool.sent         T2 check_availability(Sat, 19:00, 4)
+28  tool.result       T2 check_availability -> available
+29  skip              reserve_table: op-a4 already committed as R2
+30  skip              cancel_reservation: op-a5 already assumed
+31  tool.sent         T2 text_group(group, table for 4, Sat 19:00)
+32  messages          delivered to group: 'table for 4, Sat 19:00'
+33  tool.result       T2 text_group -> M1
+34  turn.end          T2
+-- restaurant holds: R2 (Sat 19:00)
+-- group received: 'table for 4, Sat 19:00'
+-- agent's last message: Booked Sat 19:00 for 4 (R2). Asked the restaurant to cancel R1 (Fri 19:00); I couldn't confirm it went through. Texted group.

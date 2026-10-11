@@ -1,0 +1,34 @@
+name: concept-count
+# Runs only when this post's folder changes: the counter's tests, the article's table from the pinned examples, and
+# the typo checks against the pinned Django, pytest and FastAPI, each checked for a line the post quotes.
+on:
+  push:
+    paths: ["concept-count/**", ".github/workflows/concept-count.yml"]
+  pull_request:
+    paths: ["concept-count/**", ".github/workflows/concept-count.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: concept-count
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - name: The article's table
+        run: |
+          python run_comparison.py | tee table.txt
+          grep -F "| LiveKit Agents 1.0.13, README 'Simple voice agent' | 20 | 2 | 11 | 3 | 0 | 0 |" table.txt
+          grep -F "| LiveKit Agents 1.8.3, README 'Simple voice agent' | 17 | 2 | 10 | 5 | 0 | 0 |" table.txt
+          grep -F "| pytest 9.1.1 docs, conftest.py (extending pytest) | 7 | 3 | 4 | 4 | 0 | 0 |" table.txt
+      - name: When each typo is caught
+        run: |
+          python typo_checks.py | tee typos.txt
+          grep -F "TIME_ZONE = America/Chicago" typos.txt
+          grep -F "unknown hook 'pytest_colection_modifyitems'" typos.txt
+          grep -F "GET /items/5 -> 422" typos.txt

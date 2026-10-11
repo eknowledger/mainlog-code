@@ -1,0 +1,7 @@
+{
+ "future-basic": "textpipe-future: warming up the model cache\nWARNING textpipe.plugins: skipping plugin 'summarize': textpipe_future.Summarize targets textpipe API 2.0, but textpipe 1.4 is installed\nPluginNotFoundError: No usable plugin named 'summarize' in 'textpipe.filters' (usable: shout).\nusable: ['shout']",
+ "future-stricter": "WARNING textpipe.plugins: skipping plugin 'summarize': its package requires textpipe>=2.0, and textpipe 1.4 is installed; not imported\nPluginNotFoundError: 'summarize' is installed but not usable: its package requires textpipe>=2.0, and textpipe 1.4 is installed; not imported.\nusable: ['shout']",
+ "broken": "WARNING textpipe.plugins: could not import plugin 'translate': ModuleNotFoundError(\"No module named 'language_tables'\")\nPluginNotFoundError: No usable plugin named 'translate' in 'textpipe.filters' (usable: shout).\nusable: ['shout']",
+ "collision": "PluginCollisionError: Two packages register 'shout' in 'textpipe.filters': textpipe-loud (textpipe_loud:Loud) and textpipe-shout (textpipe_shout:Shout). Rename the entry point in one of them, or uninstall one.",
+ "choose": "select(Casing): AmbiguousPluginError: 2 plugins are a Casing: caps, shout. Pin one: select(Casing, pin=...).\nselect(Casing, pin='caps'): textpipe_caps:Caps"
+}

@@ -1,0 +1,95 @@
+name: keys-then-audio
+# Runs only when this post's folder changes, and fails if a script stops printing what the post quotes.
+# The SRTP bytes and the SDP fixtures are deterministic and checked exactly. The call's timings vary with the machine,
+# so they are checked for order and sanity only, never for a value.
+on:
+  push:
+    paths: ["keys-then-audio/**", ".github/workflows/keys-then-audio.yml"]
+  pull_request:
+    paths: ["keys-then-audio/**", ".github/workflows/keys-then-audio.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: keys-then-audio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: One packet through SRTP, byte for byte as the post shows
+        run: |
+          python srtp_one_packet.py | tee /tmp/srtp.txt
+          grep -F "Key derivation matches RFC 3711 appendix B.3" /tmp/srtp.txt
+          grep -F "RTP  packet  92 B   header 80 6f 03 f2 00 00 25 80 1f 2e 3d 4c   payload 4b 41 10 98 fe 7e b5 24" /tmp/srtp.txt
+          grep -F "SRTP packet 102 B   header 80 6f 03 f2 00 00 25 80 1f 2e 3d 4c   payload 62 23 76 62 5a f9 71 28" /tmp/srtp.txt
+          grep -F "tag a3 29 b9 90 13 a1 c5 52 0a 5d (10 B)" /tmp/srtp.txt
+          grep -F "header byte-identical: yes; payload bytes changed: 80 of 80; added: 10 B, all of it tag" /tmp/srtp.txt
+          grep -F "recomputed from RFC 3711 alone: identical, byte for byte" /tmp/srtp.txt
+          grep -F "the same packet again (a replay):     rejected (replay check failed" /tmp/srtp.txt
+          grep -F "one bit flipped in the payload:       rejected (authentication failure)" /tmp/srtp.txt
+          grep -F "one bit flipped in the sequence no.:  rejected (authentication failure)" /tmp/srtp.txt
+          grep -F "with the other direction's keys:      rejected (authentication failure)" /tmp/srtp.txt
+          grep -F "and the untouched packet, after all that: accepted" /tmp/srtp.txt
+          grep -F "with ROC 1: yes; with ROC 0: no" /tmp/srtp.txt
+          grep -F "tag 8b 05 ba d0 08 22 dc b1 72 7c 42 4a ee 98 38 d1 (16 B)" /tmp/srtp.txt
+          grep -F "salt padded as libsrtp does: identical, byte for byte" /tmp/srtp.txt
+      - name: The SDP fixtures regenerate byte for byte, and every rule holds
+        run: |
+          python sdp_fixtures.py | tee /tmp/sdp.txt
+          git diff --exit-code -- sdp/
+          grep -F "Every sample is as intended." /tmp/sdp.txt
+          grep -F "alice-offer-broken.sdp: fails exactly the 6 rules it was built to" /tmp/sdp.txt
+          grep -F "answered it, choosing a=setup:active" /tmp/sdp.txt
+          test "$(openssl x509 -in sdp/server-cert.pem -noout -fingerprint -sha256 | cut -d= -f2)" = \
+               "$(grep '^a=fingerprint:' sdp/server-answer.sdp | cut -d' ' -f2 | tr -d '\r')"
+          echo "openssl agrees with the server's fingerprint"
+      - name: The keys come from one exporter output, cut as RFC 5764 says
+        run: |
+          python keys.py | tee /tmp/keys.txt
+          grep -F "Alice is the DTLS server, the server is the DTLS client; profile SRTP_AES128_CM_SHA1_80" /tmp/keys.txt
+          grep -F "60 B: identical on both sides" /tmp/keys.txt
+          grep -F "decrypted with the server_write key and salt (Alice is the DTLS server)" /tmp/keys.txt
+          grep -F "the other direction's: rejected (authentication failure)" /tmp/keys.txt
+      - name: One call, in order, with the roles and checks the post describes
+        run: |
+          python call_timeline.py --runs 10 | tee /tmp/call.txt
+          grep -F "Offer a=setup:actpass, answer a=setup:active" /tmp/call.txt
+          grep -F "Alice  is the DTLS server: DTLSv1.2" /tmp/call.txt
+          grep -F "server is the DTLS client: DTLSv1.2" /tmp/call.txt
+          grep -F "flight 1: ClientHello" /tmp/call.txt
+          grep -F "DTLS: 4 flights" /tmp/call.txt
+          test "$(grep -c '...: match$' /tmp/call.txt)" = 2
+          grep -F "SRTP profile SRTP_AEAD_AES_256_GCM" /tmp/call.txt
+          grep -F "16 B added" /tmp/call.txt
+          grep -F "Every call ran gather, check, handshake, media, in that order: yes" /tmp/call.txt
+          grep -F "No media packet left before the last handshake datagram, in any call: yes" /tmp/call.txt
+          grep -F "Alice's DTLS transport ends failed. Alice sent 0 media packets and read none" /tmp/call.txt
+          python - <<'PY'
+          import re
+          text = open("/tmp/call.txt").read()
+          rows = dict(re.findall(r"^  (\S.*?)\s+[\d.]+\s+([\d.]+)\s+[\d.]+$", text, re.M))  # the medians
+          total = float(rows["cold start to first frame decoded"])
+          assert all(float(v) >= 0 for v in rows.values()), rows
+          assert 0 < total < 5000, total  # a sanity bound for a loaded runner, not a claim
+          print(f"{len(rows)} spans, all non-negative; median cold start {total} ms on this runner")
+          PY
+          python call_timeline.py --runs 2 --profile cm80 | tee /tmp/cm80.txt
+          grep -F "SRTP profile SRTP_AES128_CM_SHA1_80" /tmp/cm80.txt
+          grep -F "10 B added" /tmp/cm80.txt
+      - name: With a 25 ms one-way delay, DTLS 1.2 takes at least two round trips and ICE at least one
+        # A floor, not a value: four flights cannot cross in less than four one-way trips, whatever the runner.
+        run: |
+          python call_timeline.py --runs 3 --delay 25 | tee /tmp/delay.txt
+          python - <<'PY'
+          import re
+          text = open("/tmp/delay.txt").read()
+          mins = dict(re.findall(r"^  (\S.*?)\s+([\d.]+)\s+[\d.]+\s+[\d.]+$", text, re.M))
+          dtls, ice = float(mins["DTLS: first flight to both sides keyed"]), float(mins["ICE: answer to both sides completed"])
+          assert dtls >= 100, dtls
+          assert ice >= 50, ice
+          print(f"DTLS keyed after {dtls} ms (floor 100), ICE completed after {ice} ms (floor 50)")
+          PY

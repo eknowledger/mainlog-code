@@ -1,0 +1,6 @@
+# Scaling is deployment configuration. rewrites/voice_agent.py doesn't change.
+[app]
+name = "voice-agent"
+
+[app.worker]
+max_concurrent = 5

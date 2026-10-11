@@ -1,0 +1,35 @@
+name: plugin-discovery
+# Runs only when this post's folder changes: every scenario in fresh environments (checked for the lines the post
+# quotes), the tests against the built host, and the pytest / Flask / stevedore comparison at pinned versions.
+on:
+  push:
+    paths: ["plugin-discovery/**", ".github/workflows/plugin-discovery.yml"]
+  pull_request:
+    paths: ["plugin-discovery/**", ".github/workflows/plugin-discovery.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugin-discovery
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"   # the version the post's traces were recorded on
+      - name: Every scenario
+        run: |
+          sh run_scenarios.sh /tmp/textpipe-work 2>&1 | tee scenarios.txt
+          grep -F "textpipe-future: warming up the model cache" scenarios.txt
+          grep -F "PluginCollisionError: Two packages register 'shout'" scenarios.txt
+          grep -F "1. too-new plugin: refused: yes, imported: no" scenarios.txt
+      - name: The tests
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install packaging pytest /tmp/textpipe-work/dist/textpipe-1.4-py3-none-any.whl
+          .venv/bin/python -m pytest -q tests
+      - name: The real hosts
+        run: |
+          sh real_hosts/run.sh /tmp/real-hosts-work 2>&1 | tee hosts.txt
+          grep -F "two distributions, one name, DriverManager: MultipleMatches" hosts.txt

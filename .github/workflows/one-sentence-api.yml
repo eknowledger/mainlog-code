@@ -1,0 +1,38 @@
+name: one-sentence-api
+# Runs only when this post's folder changes. The proposals can't run (they import a package that doesn't exist), so
+# the checks are the ones the post shows: the linter finds the undefined self, the proposal's tool fails only when
+# called, the rewrite runs against the stand-in framework, and the line count the post quotes.
+on:
+  push:
+    paths: ["one-sentence-api/**", ".github/workflows/one-sentence-api.yml"]
+  pull_request:
+    paths: ["one-sentence-api/**", ".github/workflows/one-sentence-api.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: one-sentence-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyflakes==3.4.0
+      - name: The linter sees the undefined self
+        run: |
+          python -m pyflakes proposals/voice_agent.py > lint.txt || true
+          grep -F "proposals/voice_agent.py:12:11: undefined name 'self'" lint.txt
+      - name: The tool imports, then fails when called
+        run: |
+          python -c "import sys; sys.path.insert(0, 'proposals'); import tool_as_proposed"
+          if python -c "import sys, asyncio; sys.path.insert(0, 'proposals'); import tool_as_proposed; asyncio.run(tool_as_proposed.transfer_call('+15550100'))" 2> err.txt; then exit 1; fi
+          grep -F "NameError: name 'self' is not defined" err.txt
+      - name: The rewrite runs
+        run: SIP_TRUNK=my-trunk CALLEE=+15551234567 PYTHONPATH=. python rewrites/voice_agent.py | grep -F "[agent] says: Hi!"
+      - name: The line count the post quotes
+        run: |
+          python count_lines.py proposals/worker.py rewrites/voice_agent.py | tee lines.txt
+          grep -E "^ *34 +proposals/worker.py" lines.txt
+          grep -E "^ *31 +rewrites/voice_agent.py" lines.txt

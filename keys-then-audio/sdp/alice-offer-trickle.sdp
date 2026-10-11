@@ -1,0 +1,25 @@
+v=0
+o=- 4611731400430051336 2 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=group:BUNDLE 0
+a=ice-options:trickle ice2
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 0.0.0.0
+a=mid:0
+a=sendrecv
+a=rtpmap:111 opus/48000/2
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtcp-fb:111 transport-cc
+a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level
+a=extmap:2 urn:ietf:params:rtp-hdrext:sdes:mid
+a=msid:alice-mic alice-mic-track
+a=ssrc:523124044 cname:alice
+a=ice-ufrag:alce
+a=ice-pwd:alice+password+23+chars
+a=fingerprint:sha-256 A9:5C:8D:BA:4C:00:E3:59:80:B8:8E:45:F1:DA:8E:5C:5D:01:AB:C7:32:0C:89:69:94:EE:DC:72:61:A1:00:DD
+a=setup:actpass
+a=tls-id:1f2e3d4c5b6a79880a1b2c3d4e5f6071
+a=rtcp:9 IN IP4 0.0.0.0
+a=rtcp-mux
+a=rtcp-rsize

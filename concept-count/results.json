@@ -1,0 +1,239 @@
+[
+  {
+    "id": "fastapi-readme",
+    "imports": [
+      "FastAPI"
+    ],
+    "members": [
+      "get"
+    ],
+    "hooks": [
+      "read_item",
+      "read_root"
+    ],
+    "options": [],
+    "strings": [
+      "/",
+      "/items/{item_id}"
+    ],
+    "settings": [],
+    "import_paths": [],
+    "names": 2,
+    "lines": 8
+  },
+  {
+    "id": "django-settings",
+    "imports": [],
+    "members": [],
+    "hooks": [],
+    "options": [],
+    "strings": [],
+    "settings": [
+      "ALLOWED_HOSTS",
+      "AUTH_PASSWORD_VALIDATORS",
+      "BASE_DIR",
+      "DATABASES",
+      "DEBUG",
+      "INSTALLED_APPS",
+      "LANGUAGE_CODE",
+      "MAILERS",
+      "MIDDLEWARE",
+      "ROOT_URLCONF",
+      "SECRET_KEY",
+      "STATIC_URL",
+      "TEMPLATES",
+      "TIME_ZONE",
+      "USE_I18N",
+      "USE_TZ",
+      "WSGI_APPLICATION"
+    ],
+    "import_paths": [
+      "django.contrib.admin",
+      "django.contrib.auth",
+      "django.contrib.auth.context_processors.auth",
+      "django.contrib.auth.middleware.AuthenticationMiddleware",
+      "django.contrib.auth.password_validation.CommonPasswordValidator",
+      "django.contrib.auth.password_validation.MinimumLengthValidator",
+      "django.contrib.auth.password_validation.NumericPasswordValidator",
+      "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+      "django.contrib.contenttypes",
+      "django.contrib.messages",
+      "django.contrib.messages.context_processors.messages",
+      "django.contrib.messages.middleware.MessageMiddleware",
+      "django.contrib.sessions",
+      "django.contrib.sessions.middleware.SessionMiddleware",
+      "django.contrib.staticfiles",
+      "django.core.mail.backends.console.EmailBackend",
+      "django.db.backends.sqlite3",
+      "django.middleware.clickjacking.XFrameOptionsMiddleware",
+      "django.middleware.common.CommonMiddleware",
+      "django.middleware.csrf.CsrfViewMiddleware",
+      "django.middleware.security.SecurityMiddleware",
+      "django.template.backends.django.DjangoTemplates",
+      "django.template.context_processors.request",
+      "mysite.wsgi.application"
+    ],
+    "names": 0,
+    "lines": 76
+  },
+  {
+    "id": "pytest-test-module",
+    "imports": [
+      "pytest"
+    ],
+    "members": [
+      "mark"
+    ],
+    "hooks": [
+      "test_func_fast",
+      "test_func_slow"
+    ],
+    "options": [],
+    "strings": [
+      "slow"
+    ],
+    "settings": [],
+    "import_paths": [],
+    "names": 2,
+    "lines": 6
+  },
+  {
+    "id": "pytest-conftest",
+    "imports": [
+      "pytest"
+    ],
+    "members": [
+      "add_marker",
+      "addinivalue_line",
+      "addoption",
+      "getoption",
+      "keywords",
+      "mark"
+    ],
+    "hooks": [
+      "pytest_addoption",
+      "pytest_collection_modifyitems",
+      "pytest_configure"
+    ],
+    "options": [
+      "action",
+      "default",
+      "help",
+      "reason"
+    ],
+    "strings": [
+      "--runslow",
+      "markers",
+      "skip",
+      "store_true"
+    ],
+    "settings": [],
+    "import_paths": [],
+    "names": 7,
+    "lines": 14
+  },
+  {
+    "id": "livekit-1.0.13-minimal",
+    "imports": [
+      "Agent",
+      "AgentSession",
+      "JobContext",
+      "RunContext",
+      "WorkerOptions",
+      "cli",
+      "deepgram",
+      "function_tool",
+      "openai",
+      "silero"
+    ],
+    "members": [
+      "LLM",
+      "STT",
+      "TTS",
+      "VAD",
+      "connect",
+      "generate_reply",
+      "load",
+      "room",
+      "run_app",
+      "start"
+    ],
+    "hooks": [
+      "entrypoint",
+      "lookup_weather"
+    ],
+    "options": [
+      "agent",
+      "entrypoint_fnc",
+      "instructions",
+      "llm",
+      "model",
+      "room",
+      "stt",
+      "tools",
+      "tts",
+      "vad",
+      "voice"
+    ],
+    "strings": [
+      "ash",
+      "gpt-4o-mini",
+      "nova-3"
+    ],
+    "settings": [],
+    "import_paths": [],
+    "names": 20,
+    "lines": 33
+  },
+  {
+    "id": "livekit-1.8.3-minimal",
+    "imports": [
+      "Agent",
+      "AgentServer",
+      "AgentSession",
+      "JobContext",
+      "RunContext",
+      "cli",
+      "function_tool",
+      "inference"
+    ],
+    "members": [
+      "LLM",
+      "STT",
+      "TTS",
+      "VAD",
+      "generate_reply",
+      "room",
+      "rtc_session",
+      "run_app",
+      "start"
+    ],
+    "hooks": [
+      "entrypoint",
+      "lookup_weather"
+    ],
+    "options": [
+      "agent",
+      "instructions",
+      "language",
+      "llm",
+      "room",
+      "stt",
+      "tools",
+      "tts",
+      "vad",
+      "voice"
+    ],
+    "strings": [
+      "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
+      "cartesia/sonic-3",
+      "deepgram/nova-3",
+      "google/gemma-4-31b-it",
+      "multi"
+    ],
+    "settings": [],
+    "import_paths": [],
+    "names": 17,
+    "lines": 34
+  }
+]
