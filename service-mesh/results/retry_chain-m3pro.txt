@@ -1,0 +1,41 @@
+Envoy 1.39.3; Apple M3 Pro, 12 cores, macOS 26.6.2
+Three retrying proxies in a row, each with Istio 1.31.1's default retry policy unless stated.
+
+1. Inventory is down (connection refused), HTTP/1.1:
+  20 user requests x 1 client attempt(s); the client saw: 503
+  retries by frontend's, checkout's and pricing's proxies: 0, 0, 40
+  attempts reaching inventory: 60, 3 per user request
+
+2. Inventory is down, gRPC (HTTP/2):
+  20 user requests x 1 client attempt(s); the client saw: 14
+  retries by frontend's, checkout's and pricing's proxies: 40, 120, 360
+  attempts reaching inventory: 540, 27 per user request
+
+3. Inventory is up but answers every request with 503, HTTP/1.1:
+  20 user requests x 1 client attempt(s); the client saw: 503
+  retries by frontend's, checkout's and pricing's proxies: 0, 0, 0
+  attempts reaching inventory: 20, 1 per user request
+
+4. The same 503s, with 503 added to retriable status codes:
+  20 user requests x 1 client attempt(s); the client saw: 503
+  retries by frontend's, checkout's and pricing's proxies: 40, 120, 360
+  attempts reaching inventory: 540, 27 per user request
+
+5. The same, and the client retries twice on top:
+  20 user requests x 3 client attempt(s); the client saw: 503
+  retries by frontend's, checkout's and pricing's proxies: 120, 360, 1080
+  attempts reaching inventory: 1620, 81 per user request
+
+6. Inventory hangs; pricing's proxy has a 300 ms per-try timeout and Istio's default retryOn:
+  retry_on connect-failure,refused-stream,unavailable,cancelled,retriable-status-codes
+  5 requests; the client saw: 504, after 0.30 to 0.30 s
+  tries reaching inventory: 5, 1 per request
+
+7. The same, with gateway-error added to retryOn:
+  retry_on connect-failure,refused-stream,unavailable,cancelled,retriable-status-codes,gateway-error
+  5 requests; the client saw: 504, after 0.93 to 0.96 s
+  tries reaching inventory: 15, 3 per request
+
+Attempts reaching inventory per user request:
+  down, HTTP: 3; down, gRPC: 27; 503, Istio's default: 1; 503 made retriable: 27; and a client retrying twice on top: 81
+A timed-out try, retried? With Istio's default retryOn, 1 try; with gateway-error added, 3 tries

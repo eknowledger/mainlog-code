@@ -1,0 +1,54 @@
+name: agent-memory
+# Runs only when this post's folder changes: the tests, checks that recorded.txt and the lab's memory-runs.json are
+# current, and the rows the post quotes.
+on:
+  push:
+    paths: ["agent-memory/**", ".github/workflows/agent-memory.yml"]
+  pull_request:
+    paths: ["agent-memory/**", ".github/workflows/agent-memory.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    defaults:
+      run:
+        working-directory: agent-memory
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pytest==8.3.5
+      - run: python -m pytest -q tests
+      - name: The recorded run is current
+        run: |
+          P="keep ttl-refresh ttl-fixed disuse-30 contra-chat contra-all provenance provenance-misfiled"
+          (python -m memory_demo; echo
+           for p in $P; do python -m memory_demo day $p; echo; done
+           python -m memory_demo inputs; echo
+           for p in $P; do python -m memory_demo writes $p; echo; done
+           for p in $P; do python -m memory_demo prompt $p; echo; done) > /tmp/recorded.txt
+          diff recorded.txt /tmp/recorded.txt
+      - name: The lab's runs file is current
+        run: |
+          cp memory-runs.json /tmp/memory-runs.before.json
+          python export_runs.py
+          diff /tmp/memory-runs.before.json memory-runs.json
+      - name: The rows the post quotes
+        run: |
+          python -m memory_demo | tee table.txt
+          grep -F "Keep forever                                        89    49       0       29" table.txt
+          grep -F "Contradiction check, chat only                      89    28       0        0" table.txt
+          grep -F "Contradiction check, every input                    89     0       0       29" table.txt
+          grep -F "Writer + dependency                                 89     0       0        0" table.txt
+          grep -F "Writer + dependency, bookings filed as stated       89    28       0        0" table.txt
+          grep -F "TTL 7 days, refreshed on read                       89    49       1       29" table.txt
+          grep -F "TTL 7 days, fixed                                   89     3      25        2" table.txt
+      - name: What the post shows the planner being sent
+        run: |
+          python -m memory_demo prompt contra-all | grep -Fx -- "- deposit_preapproved: yes"
+          python -m memory_demo prompt provenance | grep -Fx -- "- ana_diet: eats fish  (user, day 30; until the user says otherwise)"
+          python -m memory_demo writes provenance | grep -F "refused: restaurant may not write deposit_preapproved"

@@ -1,0 +1,168 @@
+{
+ "slowMs": 500,
+ "total": 20000,
+ "slow": 94,
+ "dashboard": {
+  "v1": {
+   "p50": 80,
+   "p99": 176
+  },
+  "v2": {
+   "p50": 80,
+   "p99": 237
+  }
+ },
+ "by": {
+  "service.version": [
+   {
+    "value": "v1",
+    "slow": 0,
+    "all": 10000
+   },
+   {
+    "value": "v2",
+    "slow": 94,
+    "all": 10000
+   }
+  ],
+  "cart.items": [
+   {
+    "value": "1-10",
+    "slow": 0,
+    "all": 15494
+   },
+   {
+    "value": "11-20",
+    "slow": 0,
+    "all": 3275
+   },
+   {
+    "value": "21-40",
+    "slow": 0,
+    "all": 1058
+   },
+   {
+    "value": "41-80",
+    "slow": 85,
+    "all": 158
+   },
+   {
+    "value": "81+",
+    "slow": 9,
+    "all": 15
+   }
+  ],
+  "tenant.id": [
+   {
+    "value": "t165",
+    "slow": 3,
+    "all": 64
+   },
+   {
+    "value": "t399",
+    "slow": 3,
+    "all": 36
+   },
+   {
+    "value": "t158",
+    "slow": 2,
+    "all": 54
+   },
+   {
+    "value": "t167",
+    "slow": 2,
+    "all": 38
+   },
+   {
+    "value": "t176",
+    "slow": 2,
+    "all": 49
+   },
+   {
+    "value": "t244",
+    "slow": 2,
+    "all": 31
+   },
+   {
+    "value": "494 other tenants",
+    "slow": 80,
+    "all": 19728
+   }
+  ],
+  "customer.region": [
+   {
+    "value": "us-east",
+    "slow": 28,
+    "all": 4964
+   },
+   {
+    "value": "ap-south",
+    "slow": 23,
+    "all": 4980
+   },
+   {
+    "value": "us-west",
+    "slow": 22,
+    "all": 5011
+   },
+   {
+    "value": "eu-west",
+    "slow": 21,
+    "all": 5045
+   }
+  ],
+  "service.version+cart.items": [
+   {
+    "value": "v2, 1-10",
+    "slow": 0,
+    "all": 7748
+   },
+   {
+    "value": "v2, 11-20",
+    "slow": 0,
+    "all": 1627
+   },
+   {
+    "value": "v2, 21-40",
+    "slow": 0,
+    "all": 531
+   },
+   {
+    "value": "v2, 41-80",
+    "slow": 85,
+    "all": 85
+   },
+   {
+    "value": "v2, 81+",
+    "slow": 9,
+    "all": 9
+   },
+   {
+    "value": "v1, 1-10",
+    "slow": 0,
+    "all": 7746
+   },
+   {
+    "value": "v1, 11-20",
+    "slow": 0,
+    "all": 1648
+   },
+   {
+    "value": "v1, 21-40",
+    "slow": 0,
+    "all": 527
+   },
+   {
+    "value": "v1, 41-80",
+    "slow": 0,
+    "all": 73
+   },
+   {
+    "value": "v1, 81+",
+    "slow": 0,
+    "all": 6
+   }
+  ]
+ },
+ "tenantsWithSlow": 82
+}

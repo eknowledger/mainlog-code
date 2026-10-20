@@ -1,0 +1,49 @@
+name: agent-cost-control
+# Runs only when this post's folder changes. The SDK runs against a local fake server, so no key and no network are
+# needed; the defaults are read from the pinned packages, so a version bump that moves one fails here.
+on:
+  push:
+    paths: ["agent-cost-control/**", ".github/workflows/agent-cost-control.yml"]
+  pull_request:
+    paths: ["agent-cost-control/**", ".github/workflows/agent-cost-control.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent-cost-control
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - name: The timeout findings the post quotes
+        timeout-minutes: 3
+        run: |
+          python timeouts.py | tee /tmp/timeouts.txt
+          grep -E "^1\. stream, a token every 1.5s, timeout=3.0s: completed in 1[7-9]\.[0-9]s, no timeout \(12 tokens\)" /tmp/timeouts.txt
+          grep -E "^2\. not streamed, 20 bytes every 1.5s, timeout=3.0s: completed in 1[5-8]\.[0-9]s, no timeout" /tmp/timeouts.txt
+          grep -F "httpx2.ReadTimeout after" /tmp/timeouts.txt
+          grep -F "an anthropic.APIError? False; an anthropic.APITimeoutError? False" /tmp/timeouts.txt
+          grep -E "deadline 5s: stopped after 5\.[0-1]s with 3 of 12 tokens" /tmp/timeouts.txt
+          grep -E "anthropic.APITimeoutError after 1[0-1]\.[0-9]s, 3 attempts \(2 retries\)" /tmp/timeouts.txt
+      - name: The defaults
+        run: |
+          python defaults.py | tee /tmp/defaults.txt
+          grep -F "anthropic 1.13.0: timeout read=600s connect=5s, max_retries=2, backoff 0.5s doubling to 8s, retry-after obeyed up to 4,294,967s" /tmp/defaults.txt
+          grep -F "openai 3.28.0: timeout read=600s connect=5s, max_retries=2" /tmp/defaults.txt
+          grep -F "openai-agents 0.23.1: max_turns=10, ModelSettings().timeout=None" /tmp/defaults.txt
+          grep -F "langgraph 1.2.14: recursion_limit=10007" /tmp/defaults.txt
+      - name: The simulation's rows, and the lab's file
+        run: |
+          python sim.py | tee /tmp/sim.txt
+          grep -F "defaults       899      0    101   249    23.2   323.8   458.2   18.78     0" /tmp/sim.txt
+          grep -F "breaker        931      0     69   131    23.2   193.2   348.7   20.24     6" /tmp/sim.txt
+          grep -F "all checks     867    133      0     0    23.2    29.6    34.8   17.08     9" /tmp/sim.txt
+          python sim.py --task 350 | grep -F "defaults: conversation 350 started at 350 s, ended failed after 203.6 s (turn limit), 60,200 tokens"
+          cp breaker-runs.json /tmp/before.json
+          python export_runs.py
+          diff /tmp/before.json breaker-runs.json

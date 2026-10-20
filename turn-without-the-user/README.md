@@ -1,14 +1,17 @@
 # agent-runtime: turns, consent, revisions, and effects
 
-A small, deterministic agent runtime used by two articles, [When a turn doesn't start with the
-user](https://mainlog.dev/posts/turn-without-the-user/) and [When the user changes their mind
-mid-task](https://mainlog.dev/posts/user-changes-their-mind/). `export_runs.py` writes `runs.json`, every scenario's
+A small, deterministic agent runtime used by three articles, [When a turn doesn't start with the
+user](https://mainlog.dev/posts/turn-without-the-user/), [When the user changes their mind
+mid-task](https://mainlog.dev/posts/user-changes-their-mind/) and [Handing off between agents: the words cross,
+the state doesn't](https://mainlog.dev/posts/agent-handoff/). `export_runs.py` writes `runs.json`, every scenario's
 log, which the articles' replay labs show. Standard library
 only; tested on Python 3.9 and 3.12. No language model: a scripted model reads each phrase
 the scenarios use into a structured result, plans steps, and writes replies from facts, so
 every outcome comes from the runtime's rules.
 
-    python -m agent_runtime.demo --list              # 52 scenario names
+    python -m agent_runtime.demo --list              # 65 scenario names
+    python -m agent_runtime.handoff                  # the handoff article's table
+    python -m agent_runtime.handoff --sees full      # what the receiving model reads in one handoff style
     python -m agent_runtime.demo offer --history     # one scenario, with the model's history
     python -m agent_runtime.demo offer --messages    # the history as a user/assistant API gets it
     python -m pip install pytest && python -m pytest tests
@@ -32,10 +35,18 @@ every outcome comes from the runtime's rules.
 - `store.py`: what survives a restart: inbox (with what has been acted on), dedupe IDs,
   operations log, the running turn's record, pending consent requests, history. Recovery
   resolves in-flight operations, resumes the turn, and replays acknowledged input.
-- `scenarios.py`: every case the articles show. `demo-output.txt` is a saved run of all of them.
+- `handoff.py`: the handoff article. A concierge agent hands an in-doubt booking to a Bookings agent in one of six
+  styles, from the full transcript to a record the sending runtime writes, against a request that landed (reply
+  lost) and one still in the network. It reuses the fake restaurant, the keys and the log format, and doesn't
+  touch the session: a handoff is between two sessions, and the receiver's model is scripted to the best case: it
+  looks a booking up by its details whenever the words show any sign one went out, the call itself or the sending
+  model's own "Booking it now". `--sees` prints what the receiving model reads in each style. `handoff-table.txt`
+  and `handoff-sees.txt` are saved runs of the table and of every style's view.
+- `scenarios.py`: every case the first two articles show. `demo-output.txt` is a saved run of all of them.
   Scenarios deliver most input with `_send()`, which waits for the session to act on it before
   the next input arrives, so each log reads in arrival order.
-- `tests/`: 72 tests. The ones at the end of each file cover combinations (input during a
+- `tests/`: 83 tests, 11 of them for the handoff article in `test_handoff.py`. The ones at the end of the first two
+  files cover combinations (input during a
   revision, crashes at each point, tampered fields, typed answers) and the claims the
   articles make about this runtime.
 
@@ -73,6 +84,8 @@ Each log in the articles is one of these runs. `--history` shows the model's his
 | Revisions: secure the replacement, then undo the old | `revise-full-old-first`, `revise-full`, `revise-fee`, `revise-fee-rises`, `revise-fee-declined`, `revise-refused`, `revise-no-lookup` |
 | Revisions: a crash in the middle | `crash-in-memory`, `crash-durable`, `crash-during-text`, `crash-during-cancel` |
 | Revisions: what the history says | `revise-after-text --history` |
+| Handoff: each style, request landed or delayed | `handoff-full`, `handoff-full-delayed`, `handoff-no-tools`, `handoff-no-tools-delayed`, `handoff-last-pair`, `handoff-last-pair-delayed`, `handoff-brief`, `handoff-brief-delayed`, `handoff-brief-omits`, `handoff-brief-omits-delayed`, `handoff-record`, `handoff-record-delayed` |
+| Handoff: lookup by details | `handoff-someone-else` |
 
 ## What this demo doesn't do
 
@@ -103,3 +116,6 @@ It shows each rule in one process. It isn't a hardened runtime, and these are kn
 - **The user channel is trusted by its source name;** only webhooks are verified.
 - **Time is a minute counter** the scenarios set, for deadlines, approvals, the signature
   tolerance and the dedupe window. The bounded wait uses real time (50 ms).
+- **A handoff is between two sessions in one process.** `handoff.py` models what crosses and what the receiver
+  can do with it; it doesn't run the receiving agent through `Session`, and "lookup by details" is a helper over
+  the fake restaurant's bookings, the most a transcript allows rather than an API real services all offer.

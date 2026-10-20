@@ -1,0 +1,23 @@
+== 100,000 requests, 25% of them on host 4, which stalls 2% of its requests by 300 to 600 ms
+host 1: 24,896 requests  mean   21.3  p50  20.1  p99   44.9  under 100 ms 100.000%
+host 2: 25,196 requests  mean   21.3  p50  20.0  p99   45.0  under 100 ms 100.000%
+host 3: 24,954 requests  mean   21.3  p50  20.0  p99   45.3  under 100 ms 100.000%
+host 4: 24,954 requests  mean   29.9  p50  20.1  p99  462.6  under 100 ms  98.064%
+
+== the questions
+mean 23.4 ms, p50 20.0, p99 49.0, p99.9 552.7
+Little's law: 2000 req/s x 23.4 ms = 46.8 requests in flight on average
+
+== rolling up four hosts
+means, weighted by requests: 23.4 ms = pooled mean 23.4 ms; unweighted average of means 23.4 ms
+average of host p99s 149.5 ms vs true p99 49.0 ms: 3.05x, too high
+under 100 ms: counts [24896, 25196, 24954, 24471] sum to 99,517 of 100,000 = 99.517%; pooled 99.517%
+
+== a page waits for its slowest call (20,000 pages each)
+ 1 call : page p50  20.0 ms, page p99  48.8, pages over 100 ms  0.5% (1 - (1 - q)^N predicts  0.5%)
+ 5 calls: page p50  29.9 ms, page p99 487.3, pages over 100 ms  2.5% (1 - (1 - q)^N predicts  2.4%)
+20 calls: page p50  38.8 ms, page p99 581.5, pages over 100 ms  9.1% (1 - (1 - q)^N predicts  9.2%)
+50 calls: page p50  45.8 ms, page p99 605.5, pages over 100 ms 21.5% (1 - (1 - q)^N predicts 21.5%)
+ 5 calls: a page's median is a request's p87.1, and a page's p99 is a request's p99.80
+20 calls: a page's median is a request's p96.6, and a page's p99 is a request's p99.95
+50 calls: a page's median is a request's p98.6, and a page's p99 is a request's p99.98

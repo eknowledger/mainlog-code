@@ -1,0 +1,31 @@
+1000 conversations, one a second; the primary is bad from 300 s to 600 s (simulation, invented rates, seed 7)
+
+incident: both Rates(overloaded=0.4, slow=0.2, malformed=0.06, loop=0.02)
+policy       answer handed failed >2min   p50 s   p99 s   max s    Mtok trips
+defaults       899      0    101   249    23.2   323.8   458.2   18.78     0
+breaker        931      0     69   131    23.2   193.2   348.7   20.24     6
+all checks     867    133      0     0    23.2    29.6    34.8   17.08     9
+only stream    813      0    187     0    23.2    62.0    66.7   20.58     0
+only valid     883     16    101   238    23.2   320.3   464.0   18.82     0
+only loop      845     86     69   238    23.2   319.6   334.8   15.97     0
+only task      685    315      0   248    23.2   171.7   191.4   15.46     0
+
+incident: overloaded Rates(overloaded=0.6, slow=0.05, malformed=0.04, loop=0.02)
+policy       answer handed failed >2min   p50 s   p99 s   max s    Mtok trips
+defaults       777      0    223   109    23.2   191.4   319.0   16.87     0
+breaker        919      0     81    49    23.2   168.9   336.9   20.79     9
+all checks     862    138      0     0    23.2    29.0    30.8   16.75    10
+only stream    744      0    256     0    23.2    60.4    63.3   17.74     0
+only valid     771     10    219   107    23.2   176.4   330.6   16.79     0
+only loop      744     76    180   101    23.2   313.2   322.9   14.50     0
+only task      698    302      0    96    23.2   168.8   179.8   15.57     0
+
+incident: slow Rates(overloaded=0.1, slow=0.4, malformed=0.06, loop=0.02)
+policy       answer handed failed >2min   p50 s   p99 s   max s    Mtok trips
+defaults       955      0     45   320    23.2   331.3   469.8   19.92     0
+breaker        955      0     45   320    23.2   331.3   469.8   19.92     0
+all checks     869    131      0     0    23.2    29.0    32.6   17.19     9
+only stream    923      0     77     0    23.2    63.2    67.5   23.19     0
+only valid     940      7     53   302    23.2   319.7   349.2   19.89     0
+only loop      904     94      2   301    23.2   319.0   458.2   16.65     0
+only task      680    320      0   304    23.2   174.0   197.2   15.53     0

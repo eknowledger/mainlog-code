@@ -1,0 +1,3 @@
+server freezes 200 ms every 1 s; client due to send 200 requests a second for 10 s
+from send time       n= 2001  p50    0.18  p90    0.26  p99    1.02  max  205.25  mean   1.21 ms  over 10 ms: 10
+from scheduled time  n= 2001  p50    0.85  p90  106.45  p99  193.84  max  204.79  mean  21.91 ms  over 10 ms: 392

@@ -1,0 +1,43 @@
+name: observability-driven
+# Runs only when this post's folder changes: the question-first tests (the red step is expected to fail), then the
+# numbers the post quotes. The span timing is printed but not checked, because it moves with the machine.
+on:
+  push:
+    paths: ["observability-driven/**", ".github/workflows/observability-driven.yml"]
+  pull_request:
+    paths: ["observability-driven/**", ".github/workflows/observability-driven.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: observability-driven
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"   # the version the post's numbers were recorded on
+      - run: pip install -r requirements.txt
+      - name: The tests, with the red step expected to fail
+        run: python -m pytest -q tests -rx
+      - name: The red step fails for the reason the post shows
+        run: |
+          ! python -m pytest -q tests --runxfail > red.txt 2>&1
+          grep -F "it has no cart.items" red.txt
+      - name: The numbers the post quotes
+        run: |
+          python investigate.py | tee investigate.txt
+          grep -F "after the deploy   p50   80 ms   p99  237 ms" investigate.txt
+          grep -F "after, as histogram_quantile reads the buckets: p50 81 ms   p99 250 ms" investigate.txt
+          grep -F "v2 with more than 40 items: 94 of 10000 requests, 0.9%" investigate.txt
+          grep -F "p50 698 ms   p99 1527 ms" investigate.txt
+          grep -F "requests over 500 ms with more than 40 items: 94 of 94" investigate.txt
+          python series_cost.py | tee cost.txt
+          grep -F "one histogram, one label set (route, status): 18 series" cost.txt
+          grep -F "500 tenants: 9000 series" cost.txt
+      - name: The lab's data is current
+        run: |
+          cp lab-runs.json /tmp/lab-runs.before.json
+          python export_runs.py
+          diff /tmp/lab-runs.before.json lab-runs.json

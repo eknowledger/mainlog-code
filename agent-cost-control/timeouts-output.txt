@@ -1,0 +1,5 @@
+1. stream, a token every 1.5s, timeout=3.0s: completed in 18.0s, no timeout (12 tokens)
+2. not streamed, 20 bytes every 1.5s, timeout=3.0s: completed in 16.5s, no timeout
+3. stream, a 4s stall after 3 tokens, timeout=3.0s: httpx2.ReadTimeout after 7.5s; an anthropic.APIError? False; an anthropic.APITimeoutError? False
+4. stream, a token every 1.5s, timeout=3.0s: deadline 5s: stopped after 5.0s with 3 of 12 tokens
+5. no response at all, timeout=3.0s: anthropic.APITimeoutError after 10.3s, 3 attempts (2 retries)

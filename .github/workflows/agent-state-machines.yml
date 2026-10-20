@@ -1,0 +1,40 @@
+name: agent-state-machines
+# Runs only when this post's folder changes. No model is called: the live run is recorded in live-run.json, and this
+# checks the table, the recorded totals the post quotes, and that the lab's replay file is current.
+on:
+  push:
+    paths: ["agent-state-machines/**", ".github/workflows/agent-state-machines.yml"]
+  pull_request:
+    paths: ["agent-state-machines/**", ".github/workflows/agent-state-machines.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent-state-machines
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pytest==8.3.5
+      - run: python -m pytest -q tests
+      - name: The lab's replay file is current
+        run: |
+          cp sm-runs.json /tmp/sm-runs.before.json
+          python export_runs.py
+          diff /tmp/sm-runs.before.json sm-runs.json
+      - name: The numbers the post quotes
+        run: |
+          python demo.py | tee /tmp/demo.txt
+          grep -F "free-form                  sent 11,876  cached-read  9,366  input cost  3,368.6  total 11,218.5" /tmp/demo.txt
+          grep -F "per-state tools            sent  4,675  cached-read    761  input cost  4,142.3  total 10,922.3" /tmp/demo.txt
+          grep -F "rep 1 per-state tools: 61% fewer tokens sent; input cost +23% step for step, +14% counting the closing call; total -2.6%" /tmp/demo.txt
+          grep -F "rep 2 per-state tools: 61% fewer tokens sent; input cost +23% step for step, +14% counting the closing call; total -3.7%" /tmp/demo.txt
+          grep -F "rep 1 per-state tools: 58% fewer tokens sent; input cost +30% step for step, +19% counting the closing call; total -10.9%" /tmp/demo.txt
+          grep -F "free-form                       rep 1: model calls 8, model time  33.8 s, sent 13,636, input cost 3,645.6, output 1,807, total 12,680.6" /tmp/demo.txt
+          grep -F "state machine, code runs steps  rep 1: model calls 2, model time   8.7 s, sent  1,143, input cost 1,143.0, output   472, total 3,503.0" /tmp/demo.txt
+          grep -F "state machine table: 7 states x 17 events = 119 cells, 13 drawn, 106 needing a decision" /tmp/demo.txt
+          grep -F "outcomes: 32 move, 22 stay, 6 defer, 59 reject" /tmp/demo.txt
+          grep -F "of the 4,096 four-call sequences, 1,400 (34%) reserve without having checked availability first" /tmp/demo.txt

@@ -1,0 +1,34 @@
+{
+ "about": "One-sided changes in httpx at b5addb6, read by hand. 'pair' is every one-sided change to the two _send_single_request copies; 'sample' is 20 partial clone-group changes drawn by sample.py (random.seed(2547)) from the 73 that cochange.py finds. Classes: out_of_step (one copy changed and the other needed it too, or the change brought one copy back in line with the other); on_purpose (the change belongs to one copy, or one family of copies, by design); cosmetic (a typo, a docstring, formatting: no behaviour changed); miscounted (both copies did change; the line tracing lost one).",
+ "pair": [
+  {"sha": "f5c27ec", "class": "cosmetic", "note": "black 20 dropped a trailing comma in the async signature; the sync signature had none to drop"},
+  {"sha": "78afd08", "class": "out_of_step", "note": "the fix for a copy slip: the async copy had been testing hasattr(stream, \"close\"), the sync copy's test, before awaiting stream.aclose(); this commit made it test \"aclose\""},
+  {"sha": "c4d2e6f", "class": "cosmetic", "note": "a trailing comma in a tuple, removed in the async copy only"},
+  {"sha": "0f280af", "class": "out_of_step", "note": "map_exceptions around the async stream close; the sync close never got it, and the Transport API rewrite (1a6e254, five weeks later) replaced both"},
+  {"sha": "f1157db", "class": "out_of_step", "note": "#2547: request logging to INFO in the sync copy only"},
+  {"sha": "4b5a92e", "class": "out_of_step", "note": "#2656: the same change in the async copy, 23 days later"},
+  {"sha": "4189b7f", "class": "cosmetic", "note": "a typo in an error message only the async copy has"}
+ ],
+ "sample": [
+  {"sha": "dea4d42", "group": "G20", "class": "miscounted", "note": "Headers.values and Headers.items both changed to decode with self.encoding; the trace of items does not reach back this far"},
+  {"sha": "6a44b05", "group": "G1", "class": "on_purpose", "note": "multipart: delete() then took a request body, like post(), and changed with that family"},
+  {"sha": "6752f7d", "group": "G1", "class": "on_purpose", "note": "delete() loses its body parameters and joins get/head/options"},
+  {"sha": "ee37a76", "group": "G1", "class": "on_purpose", "note": "the module-level functions switch from AsyncClient to the reintroduced sync Client"},
+  {"sha": "a4145ce", "group": "G7", "class": "out_of_step", "note": "Client.__init__ gains the http2 parameter AsyncClient.__init__ already had"},
+  {"sha": "891d865", "group": "G14", "class": "cosmetic", "note": "the async docstring's example lacked an await: the sync docstring, copied"},
+  {"sha": "84ca201", "group": "G2", "class": "on_purpose", "note": "proxies added to the module-level functions; a client takes it in its constructor"},
+  {"sha": "924fa8c", "group": "G3", "class": "cosmetic", "note": "a docstring for httpx.stream()"},
+  {"sha": "69409bb", "group": "G1", "class": "on_purpose", "note": "USE_CLIENT_DEFAULT, a client-only idea, in the client methods"},
+  {"sha": "61188fe", "group": "G2", "class": "on_purpose", "note": "an extensions parameter for the client methods, which the module-level functions do not take"},
+  {"sha": "82ba15b", "group": "G20", "class": "cosmetic", "note": "typos in a docstring only Headers.items has"},
+  {"sha": "5b06aea", "group": "G7", "class": "out_of_step", "note": "AsyncClient.__init__'s default_encoding annotation widened to match Client.__init__'s"},
+  {"sha": "8152c4f", "group": "G1", "class": "on_purpose", "note": "a type for the client methods' extensions parameter"},
+  {"sha": "a54eccc", "group": "G27", "class": "out_of_step", "note": "#2845: proxy_ssl_context passed in HTTPTransport only; AsyncHTTPTransport got it in 88a81c5 (#3175), eight months later"},
+  {"sha": "1e11096", "group": "G18", "class": "out_of_step", "note": "TextChunker.decode stops returning an empty chunk; ByteChunker.decode had had the same fix since 420911b (#2068), 22 months earlier"},
+  {"sha": "1a66014", "group": "G8", "class": "out_of_step", "note": "#3023 'Add missing argument': http1 passed in AsyncClient._init_proxy_transport, as Client's already did"},
+  {"sha": "f3eb3c9", "group": "G1", "class": "out_of_step", "note": "#3120 'Keep clients in sync': Client.get's auth annotation brought in line with the other methods"},
+  {"sha": "1805ee0", "group": "G2", "class": "on_purpose", "note": "verify reworked on the module-level functions; a client takes it in its constructor"},
+  {"sha": "80960fa", "group": "G1", "class": "on_purpose", "note": "verify's type widened on the module-level functions only, for the same reason"},
+  {"sha": "4189b7f", "group": "G25", "class": "cosmetic", "note": "a typo in an error message only aiter_raw has"}
+ ]
+}

@@ -1,0 +1,174 @@
+== buckets: equal traffic, one host stalls
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{instance="host-1",le="0.005"} 0
+http_request_duration_seconds_bucket{instance="host-1",le="0.01"} 599
+http_request_duration_seconds_bucket{instance="host-1",le="0.025"} 18306
+http_request_duration_seconds_bucket{instance="host-1",le="0.05"} 24790
+http_request_duration_seconds_bucket{instance="host-1",le="0.1"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="0.25"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="0.5"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="1"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="2.5"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="5"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="10"} 24896
+http_request_duration_seconds_bucket{instance="host-1",le="+Inf"} 24896
+http_request_duration_seconds_sum{instance="host-1"} 530.211
+http_request_duration_seconds_count{instance="host-1"} 24896
+http_request_duration_seconds_bucket{instance="host-2",le="0.005"} 2
+http_request_duration_seconds_bucket{instance="host-2",le="0.01"} 597
+http_request_duration_seconds_bucket{instance="host-2",le="0.025"} 18564
+http_request_duration_seconds_bucket{instance="host-2",le="0.05"} 25093
+http_request_duration_seconds_bucket{instance="host-2",le="0.1"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="0.25"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="0.5"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="1"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="2.5"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="5"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="10"} 25196
+http_request_duration_seconds_bucket{instance="host-2",le="+Inf"} 25196
+http_request_duration_seconds_sum{instance="host-2"} 535.807
+http_request_duration_seconds_count{instance="host-2"} 25196
+http_request_duration_seconds_bucket{instance="host-3",le="0.005"} 0
+http_request_duration_seconds_bucket{instance="host-3",le="0.01"} 624
+http_request_duration_seconds_bucket{instance="host-3",le="0.025"} 18316
+http_request_duration_seconds_bucket{instance="host-3",le="0.05"} 24845
+http_request_duration_seconds_bucket{instance="host-3",le="0.1"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="0.25"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="0.5"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="1"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="2.5"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="5"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="10"} 24954
+http_request_duration_seconds_bucket{instance="host-3",le="+Inf"} 24954
+http_request_duration_seconds_sum{instance="host-3"} 530.644
+http_request_duration_seconds_count{instance="host-3"} 24954
+http_request_duration_seconds_bucket{instance="host-4",le="0.005"} 0
+http_request_duration_seconds_bucket{instance="host-4",le="0.01"} 599
+http_request_duration_seconds_bucket{instance="host-4",le="0.025"} 18069
+http_request_duration_seconds_bucket{instance="host-4",le="0.05"} 24357
+http_request_duration_seconds_bucket{instance="host-4",le="0.1"} 24471
+http_request_duration_seconds_bucket{instance="host-4",le="0.25"} 24471
+http_request_duration_seconds_bucket{instance="host-4",le="0.5"} 24765
+http_request_duration_seconds_bucket{instance="host-4",le="1"} 24954
+http_request_duration_seconds_bucket{instance="host-4",le="2.5"} 24954
+http_request_duration_seconds_bucket{instance="host-4",le="5"} 24954
+http_request_duration_seconds_bucket{instance="host-4",le="10"} 24954
+http_request_duration_seconds_bucket{instance="host-4",le="+Inf"} 24954
+http_request_duration_seconds_sum{instance="host-4"} 745.317
+http_request_duration_seconds_count{instance="host-4"} 24954
+
+== buckets: most traffic on the stalling host
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{instance="host-1",le="0.005"} 0
+http_request_duration_seconds_bucket{instance="host-1",le="0.01"} 241
+http_request_duration_seconds_bucket{instance="host-1",le="0.025"} 7517
+http_request_duration_seconds_bucket{instance="host-1",le="0.05"} 10156
+http_request_duration_seconds_bucket{instance="host-1",le="0.1"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="0.25"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="0.5"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="1"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="2.5"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="5"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="10"} 10203
+http_request_duration_seconds_bucket{instance="host-1",le="+Inf"} 10203
+http_request_duration_seconds_sum{instance="host-1"} 217.222
+http_request_duration_seconds_count{instance="host-1"} 10203
+http_request_duration_seconds_bucket{instance="host-2",le="0.005"} 0
+http_request_duration_seconds_bucket{instance="host-2",le="0.01"} 246
+http_request_duration_seconds_bucket{instance="host-2",le="0.025"} 7307
+http_request_duration_seconds_bucket{instance="host-2",le="0.05"} 9885
+http_request_duration_seconds_bucket{instance="host-2",le="0.1"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="0.25"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="0.5"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="1"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="2.5"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="5"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="10"} 9934
+http_request_duration_seconds_bucket{instance="host-2",le="+Inf"} 9934
+http_request_duration_seconds_sum{instance="host-2"} 211.511
+http_request_duration_seconds_count{instance="host-2"} 9934
+http_request_duration_seconds_bucket{instance="host-3",le="0.005"} 0
+http_request_duration_seconds_bucket{instance="host-3",le="0.01"} 260
+http_request_duration_seconds_bucket{instance="host-3",le="0.025"} 7250
+http_request_duration_seconds_bucket{instance="host-3",le="0.05"} 9903
+http_request_duration_seconds_bucket{instance="host-3",le="0.1"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="0.25"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="0.5"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="1"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="2.5"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="5"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="10"} 9942
+http_request_duration_seconds_bucket{instance="host-3",le="+Inf"} 9942
+http_request_duration_seconds_sum{instance="host-3"} 211.604
+http_request_duration_seconds_count{instance="host-3"} 9942
+http_request_duration_seconds_bucket{instance="host-4",le="0.005"} 2
+http_request_duration_seconds_bucket{instance="host-4",le="0.01"} 1651
+http_request_duration_seconds_bucket{instance="host-4",le="0.025"} 50524
+http_request_duration_seconds_bucket{instance="host-4",le="0.05"} 68227
+http_request_duration_seconds_bucket{instance="host-4",le="0.1"} 68519
+http_request_duration_seconds_bucket{instance="host-4",le="0.25"} 68519
+http_request_duration_seconds_bucket{instance="host-4",le="0.5"} 69357
+http_request_duration_seconds_bucket{instance="host-4",le="1"} 69921
+http_request_duration_seconds_bucket{instance="host-4",le="2.5"} 69921
+http_request_duration_seconds_bucket{instance="host-4",le="5"} 69921
+http_request_duration_seconds_bucket{instance="host-4",le="10"} 69921
+http_request_duration_seconds_bucket{instance="host-4",le="+Inf"} 69921
+http_request_duration_seconds_sum{instance="host-4"} 2115.546
+http_request_duration_seconds_count{instance="host-4"} 69921
+
+== buckets as CSV, finer edges in ms: equal traffic
+instance,le,count
+host-1,10,599
+host-1,20,12353
+host-1,30,21805
+host-1,40,24299
+host-1,50,24790
+host-1,100,24896
+host-1,250,24896
+host-1,500,24896
+host-1,+Inf,24896
+host-2,10,597
+host-2,20,12617
+host-2,30,22055
+host-2,40,24615
+host-2,50,25093
+host-2,100,25196
+host-2,250,25196
+host-2,500,25196
+host-2,+Inf,25196
+host-3,10,624
+host-3,20,12450
+host-3,30,21881
+host-3,40,24352
+host-3,50,24845
+host-3,100,24954
+host-3,250,24954
+host-3,500,24954
+host-3,+Inf,24954
+host-4,10,599
+host-4,20,12336
+host-4,30,21450
+host-4,40,23907
+host-4,50,24357
+host-4,100,24471
+host-4,250,24471
+host-4,500,24765
+host-4,+Inf,24954
+
+== equal traffic, one host stalls
+host 1: 20 19 21 19 24 17 17 30 13 19 19 23 31 17 22 19 25 11 13 21 11 17 20 15 13 29 27 17 28 16 28 22 19 19 29 16 36 15 18 21 15 17 31 21 11 40 12 35 16 28
+
+host 2: 21 32 16 13 24 11 21 27 25 14 19 20 18 19 15 17 25 19 24 37 29 26 23 17 14 21 22 22 23 22 20 14 36 29 28 35 22 23 21 21 28 30 14 31 14 13 13 19 24 25
+
+host 3: 17 16 15 19 23 35 18 12 11 29 15 26 25 19 25 33 13 17 16 16 25 11 19 44 12 24 15 25 20 24 19 11 28 24 27 11 31 13 18 17 16 17 25 37 21 29 16 31 28 12
+
+host 4: 15 20 10 16 28 26 26 21 14 14 15 31 13 32 24 42 17 439 33 29 52 14 22 17 26 20 30 23 17 23 18 35 15 21 44 22 15 17 19 14 26 24 21 23 27 24 26 28 24 24
+
+== most traffic on the stalling host
+host 1: 32 16 13 19 15 19 37 33 22 16 23 44 19 18 16 28 12 13 25 19
+
+host 2: 17 15 19 23 25 19 25 13 17 16 19 12 24 15 25 20 24 27 17 17
+
+host 3: 35 18 12 11 29 26 25 11 24 11 28 11 31 13 25 37 21 22 30 12
+
+host 4: 20 19 21 19 24 15 21 20 16 17 17 10 30 16 24 28 11 13 26 26 21 19 19 337 21 25 14 14 15 31 13 23 32 14 24 42 17 439 20 31 17 22 33 19 29 25 52 14 22 18 17 26 19 15 11 13 17 20 25 30 24 23 17 21 29 23 26 11 18 17 23 35 17 20 15 21 15 13 14 44 29 27 21 17 28 16 28 22 22 15 22 19 19 29 374 36 17 22 20 15 19 18 14 21 26 14 24 36 21 15 29 17 28 31 23 27 21 24 26 35 11 28 536 24 24 23 40 12 35 25 21 16 16 15 21 28 13 16 11 16

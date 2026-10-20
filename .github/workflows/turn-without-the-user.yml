@@ -1,5 +1,5 @@
 name: turn-without-the-user
-# The runtime behind two posts. Runs only when its folder changes: the tests, then a check that runs.json, every
+# The runtime behind three posts. Runs only when its folder changes: the tests, then a check that runs.json, every
 # scenario's recorded log, is current. The posts quote those logs and their replay labs show them, so a runtime change
 # that alters any log fails here until runs.json is regenerated and the posts are checked against it.
 on:
@@ -35,3 +35,11 @@ jobs:
           python -m agent_runtime.demo offer-as-user | grep -F "16  turn.start        T2 origin=user"
           python -m agent_runtime.demo revise-in-flight-naive | grep -F "-- restaurant holds: R1 (Fri 19:00), R2 (Sat 19:00)"
           python -m agent_runtime.demo revise-in-flight | grep -F "-- restaurant holds: R2 (Sat 19:00)"
+          python -m agent_runtime.demo handoff-full-delayed | grep -F -- "-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)"
+          python -m agent_runtime.demo handoff-record-delayed | grep -F "restaurant        refused a late request: key s1:op-a2 is closed"
+      - name: The handoff article's table
+        run: |
+          python -m agent_runtime.handoff > /tmp/handoff-table.txt
+          diff handoff-table.txt /tmp/handoff-table.txt
+          python -m agent_runtime.handoff --sees > /tmp/handoff-sees.txt
+          diff handoff-sees.txt /tmp/handoff-sees.txt

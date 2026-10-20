@@ -1,0 +1,47 @@
+name: service-mesh
+# Runs only when this post's folder changes. The arithmetic needs nothing; the retry chain needs a real Envoy.
+on:
+  push:
+    paths: ["service-mesh/**", ".github/workflows/service-mesh.yml"]
+  pull_request:
+    paths: ["service-mesh/**", ".github/workflows/service-mesh.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: service-mesh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The arithmetic
+        run: |
+          python -m unittest test_models.py
+          python retry_fanout.py | tee /tmp/fanout.txt
+          grep -F "Istio's default over gRPC, 2 retries per call      27" /tmp/fanout.txt
+          grep -F "Istio's 2, inside code that retries twice         729" /tmp/fanout.txt
+          python timeout_budget.py | tee /tmp/timeouts.txt
+          grep -F "the top call can take 9.20 s when the bottom hangs; the user's app waits 2.00 s, so it does not fit" /tmp/timeouts.txt
+          grep -F "the app gives frontend 2.00 s in all, but frontend's 3 tries need 9.20 s: none can finish" /tmp/timeouts.txt
+          grep -F "checkout gives pricing 1.00 s per try, but pricing's 3 tries need 1.55 s: only 1 can finish" /tmp/timeouts.txt
+          grep -F "the top call can take 1.48 s when the bottom hangs; the user's app waits 2.00 s, so it fits" /tmp/timeouts.txt
+      - name: Envoy 1.39.3, from its official image
+        run: |
+          docker create --name envoy envoyproxy/envoy:v1.39.3
+          sudo docker cp envoy:/usr/local/bin/envoy /usr/local/bin/envoy
+          docker rm envoy
+          envoy --version | grep -F "/1.39.3/"
+      - name: Three retrying proxies count what the post says
+        timeout-minutes: 5
+        run: |
+          python retry_chain.py | tee /tmp/chain.txt
+          grep -F "down, HTTP: 3; down, gRPC: 27; 503, Istio's default: 1; 503 made retriable: 27; and a client retrying twice on top: 81" /tmp/chain.txt
+          grep -F "A timed-out try, retried? With Istio's default retryOn, 1 try; with gateway-error added, 3 tries" /tmp/chain.txt
+      - name: The hop benchmark runs (its numbers are the runner's, so only checked for shape)
+        timeout-minutes: 5
+        run: |
+          python bench_hops.py --quick --max-hops 2 | tee /tmp/bench.txt
+          grep -E "per hop, mTLS, p50: [0-9]+ µs" /tmp/bench.txt

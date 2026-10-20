@@ -1,0 +1,57 @@
+== astral-sh/ruff: 708 of 1000 merged PRs by people, with a review by someone else, created 2026-08-03 to 2026-10-08
+left out: 122 written by bots; 170 by people with no review by anyone else, median 44 lines against 158 for those kept
+    lines   PRs  median pickup  review threads per 100 lines
+     1-10    53         0.37 h                          4.98
+    11-50   104         0.86 h                          1.81
+   51-200   241         4.58 h                          0.88
+  201-500   153         8.70 h                          0.56
+ 501-2000   134        13.03 h                          0.54
+    2001+    23        12.77 h                          0.19
+fit: e = 0.43 (95% bootstrap 0.31 to 0.55), r = 0.27, n = 708; doubling a PR multiplies its expected wait by 1.35
+     without the 87 PRs reviewed within 3 minutes of being ready: e = 0.48, n = 621
+split into k PRs, expected waiting against one PR's, if size drives the pickup as the fit says | if size has no effect:
+   k        one after another   side by side  in one sitting |  after   side  sitting
+   2     x1.48 (1.37 to 1.61)          x1.35           x0.74 |     x2  x1.81    x1.00
+   4     x2.20 (1.87 to 2.59)          x1.72           x0.55 |     x4  x3.08    x1.00
+   8     x3.27 (2.56 to 4.17)          x2.08           x0.41 |     x8  x4.89    x1.00
+on medians instead of means, k = 8: one after another x16.58, side by side x9.24, in one sitting x0.41
+with a bot review: 3% of PRs of 11-50 lines, 1% of 501-2000; one 800-line PR on the fit: median pickup 8.9 h, mean 65.8 h
+
+== grafana/grafana: 857 of 1000 merged PRs by people, with a review by someone else, created 2026-09-17 to 2026-10-10
+left out: 140 written by bots; 3 by people with no review by anyone else, median 46 lines against 131 for those kept
+    lines   PRs  median pickup  review threads per 100 lines
+     1-10   105         0.20 h                          7.35
+    11-50   158         2.37 h                          1.05
+   51-200   260         1.06 h                          0.79
+  201-500   165         2.00 h                          0.57
+ 501-2000   144         2.96 h                          0.35
+    2001+    25         1.10 h                          0.09
+fit: e = 0.25 (95% bootstrap 0.17 to 0.34), r = 0.19, n = 857; doubling a PR multiplies its expected wait by 1.19
+     without the 96 PRs reviewed within 3 minutes of being ready: e = 0.16, n = 761
+split into k PRs, expected waiting against one PR's, if size drives the pickup as the fit says | if size has no effect:
+   k        one after another   side by side  in one sitting |  after   side  sitting
+   2     x1.68 (1.58 to 1.78)          x1.54           x0.84 |     x2  x1.83    x1.00
+   4     x2.83 (2.50 to 3.17)          x2.26           x0.71 |     x4  x3.17    x1.00
+   8     x4.76 (3.96 to 5.65)          x3.10           x0.59 |     x8  x5.12    x1.00
+on medians instead of means, k = 8: one after another x53.21, side by side x31.93, in one sitting x0.59
+with a bot review: 15% of PRs of 11-50 lines, 54% of 501-2000; one 800-line PR on the fit: median pickup 2.1 h, mean 34.2 h
+
+== pola-rs/polars: 622 of 1000 merged PRs by people, with a review by someone else, created 2026-06-03 to 2026-10-09
+left out: 2 written by bots; 376 by people with no review by anyone else, median 110 lines against 62 for those kept
+    lines   PRs  median pickup  review threads per 100 lines
+     1-10    89         2.20 h                          2.01
+    11-50   192        15.06 h                          0.96
+   51-200   186        15.20 h                          0.39
+  201-500    81        19.35 h                          0.38
+ 501-2000    64        16.92 h                          0.21
+    2001+    10        13.20 h                          0.18
+fit: e = 0.18 (95% bootstrap 0.06 to 0.29), r = 0.12, n = 622; doubling a PR multiplies its expected wait by 1.13
+     without the 38 PRs reviewed within 3 minutes of being ready: e = 0.20, n = 584
+split into k PRs, expected waiting against one PR's, if size drives the pickup as the fit says | if size has no effect:
+   k        one after another   side by side  in one sitting |  after   side  sitting
+   2     x1.77 (1.63 to 1.91)          x1.57           x0.88 |     x2  x1.77    x1.00
+   4     x3.12 (2.67 to 3.66)          x2.34           x0.78 |     x4  x2.96    x1.00
+   8     x5.52 (4.36 to 6.99)          x3.32           x0.69 |     x8  x4.66    x1.00
+on medians instead of means, k = 8: one after another x14.88, side by side x6.92, in one sitting x0.69
+with a bot review: 0% of PRs of 11-50 lines, 0% of 501-2000; one 800-line PR on the fit: median pickup 19.8 h, mean 77.1 h
+

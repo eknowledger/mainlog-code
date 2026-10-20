@@ -1,0 +1,48 @@
+name: backpressure
+# Runs only when this post's folder changes, and fails if the simulation stops printing what the post quotes.
+on:
+  push:
+    paths: ["backpressure/**", ".github/workflows/backpressure.yml"]
+  pull_request:
+    paths: ["backpressure/**", ".github/workflows/backpressure.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backpressure
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The post's numbers and the model's shape
+        run: python -m unittest test_shed_sim.py
+      - name: The tables print what the post quotes
+        run: |
+          python shed_sim.py | tee /tmp/out.txt
+          grep -F "unbounded queue (FIFO)                     8.4%     0.0%     91.6%   1125ms  1982ms      8.4%  1.00   14309  90 s" /tmp/out.txt
+          grep -F "skip the abandoned                        19.5%     0.0%     80.5%" /tmp/out.txt
+          grep -F "bounded queue, reject when full           67.1%    32.9%      0.0%    550ms   894ms     68.4%  1.00       0  0 s" /tmp/out.txt
+          grep -F "bounded, orders first                     67.1%    32.9%      0.0%    549ms   892ms    100.0%  1.00       0  0 s" /tmp/out.txt
+          grep -F "queue timeout (CoDel-style)               64.4%    35.6%      0.0%     98ms" /tmp/out.txt
+          grep -F "newest first (adaptive LIFO + CoDel)      64.3%    35.7%      0.0%     81ms" /tmp/out.txt
+          grep -F "unbounded queue (FIFO)                     8.4%     0.0%     91.6%   1125ms  1982ms      8.4%  3.73   82460  not by the end" /tmp/out.txt
+          grep -F "bounded queue, reject when full           69.0%    31.0%      0.0%   1500ms  4309ms     68.6%  2.69       0  0 s" /tmp/out.txt
+          grep -F "queue timeout (CoDel-style)               68.6%    31.4%      0.0%" /tmp/out.txt
+          grep -F "queue timeout (CoDel-style)            answered  98.3%, fast no  1.7%" /tmp/out.txt
+          grep -F "refusing costs 20 ms: answered  56.9%" /tmp/out.txt
+          grep -F "refusing costs 80 ms: answered   0.7%" /tmp/out.txt
+          grep -F "bound   50: bounded, retries=2, spike 150/s, timeout 2 s: answered 68.4%" /tmp/out.txt
+          grep -F "recovered: not by the end" /tmp/out.txt
+          grep -F "bound 1024: bounded, retries=0, spike 150/s, timeout 2 s: answered 8.4%, fast no 22.0%" /tmp/out.txt
+          grep -E "bound  150: .*recovered: 0 s" /tmp/out.txt
+          grep -E "bound  300: .*recovered: not by the end" /tmp/out.txt
+          grep -E "bound 1024: bounded, retries=0, .*recovered: 30 s" /tmp/out.txt
+          grep -F "retries=1: 70/s x 2 tries = 140/s against 100/s, never drains" /tmp/out.txt
+          grep -F "retries=3: 70/s x 4 tries = 280/s against 100/s, never drains" /tmp/out.txt
+      - name: The lab's recorded runs are what the script exports
+        run: |
+          python export_runs.py > /tmp/runs.json
+          cmp /tmp/runs.json runs.json

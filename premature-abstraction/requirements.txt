@@ -1,0 +1,2 @@
+# The script and the reference are standard library only; pytest runs the tests.
+pytest==8.4.2

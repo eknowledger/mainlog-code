@@ -1,0 +1,70 @@
+name: premature-abstraction
+# Runs only when this post's folder changes: the counting rules' tests, then cochange.py on httpx at the pinned commit,
+# checked for the lines the post quotes, and the hand-checked sample checked against a fresh draw. Then flask at its
+# pinned commit, for the post's limits section.
+on:
+  push:
+    paths: ["premature-abstraction/**", ".github/workflows/premature-abstraction.yml"]
+  pull_request:
+    paths: ["premature-abstraction/**", ".github/workflows/premature-abstraction.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: premature-abstraction
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - run: ./fetch_httpx.sh /tmp/httpx
+      - name: The two _send_single_request copies
+        run: |
+          python cochange.py /tmp/httpx httpx --pair httpx/_client.py:Client._send_single_request httpx/_client.py:AsyncClient._send_single_request | tee pair.txt
+          grep -F "99.6% alike, 34 and 33 lines" pair.txt
+          grep -F "history stops where each copy got its name: 22 earlier commits traced other code" pair.txt
+          grep -F "left out: 1 commit from before both existed, 1 sweeping (over 20 files)" pair.txt
+          grep -F "both exist from e107e0f 2020-07-17 Tighten public client methods (#997)" pair.txt
+          grep -F "after that: together 15, only first 1, only second 6" pair.txt
+          grep -F "only first  f1157db 2023-03-20 Use standard logging style (#2547)" pair.txt
+          grep -F "only second 4b5a92e 2023-04-12 set logging request lines to INFO level for async method also (#2656)" pair.txt
+      - name: httpx.get and Client.get
+        run: |
+          python cochange.py /tmp/httpx httpx --pair httpx/_api.py:get httpx/_client.py:Client.get | tee get.txt
+          grep -F "87.8% alike, 34 and 28 lines" get.txt
+          grep -F "after that: together 3, only first 5, only second 7" get.txt
+      - name: The whole of httpx, and the hand-checked sample
+        run: |
+          python cochange.py /tmp/httpx httpx --json httpx.json | tee scan.txt
+          grep -F "128 near-duplicate pairs (>= 85% alike), in 28 clone groups" scan.txt
+          grep -F "all groups: 232 consistent, 73 partial (24% partial), 38 sweeping left out" scan.txt
+          python sample.py httpx.json | tee sample.txt
+          grep -F "sample: out_of_step 6, on_purpose 9, cosmetic 4, miscounted 1" sample.txt
+      - name: The browser tool's reference agrees with cochange.py
+        run: |
+          cd /tmp/httpx
+          sed -n 1001,1034p httpx/_client.py > /tmp/sync.py
+          sed -n 1717,1749p httpx/_client.py > /tmp/async.py
+          git log --no-patch --format='%h %cI %s' -L 1001,1034:httpx/_client.py > /tmp/sync.log
+          git log --no-patch --format='%h %cI %s' -L 1717,1749:httpx/_client.py > /tmp/async.log
+          cd -
+          python tool_reference.py /tmp/sync.py /tmp/async.py /tmp/sync.log /tmp/async.log --since e107e0f --ignore 8e36f2b | tee ref.json
+          grep -F '"together": 15' ref.json
+          grep -F '"only_a": 1' ref.json
+          grep -F '"only_b": 6' ref.json
+          grep -F '"before": 23' ref.json
+          # Counted from where git's line tracing starts, the post's 29 together and 4 + 11 one-sided:
+          python tool_reference.py /tmp/sync.py /tmp/async.py /tmp/sync.log /tmp/async.log --ignore 8e36f2b | tee raw.json
+          grep -F '"together": 29' raw.json
+          grep -F '"only_a": 4' raw.json
+          grep -F '"only_b": 11' raw.json
+      - name: flask, where a module split restarts every history
+        run: |
+          ./fetch_flask.sh /tmp/flask
+          python cochange.py /tmp/flask src | tee flask.txt
+          grep -F "22 near-duplicate pairs (>= 85% alike), in 6 clone groups" flask.txt
+          grep -F "all groups: 11 consistent, 0 partial (0% partial), 3 sweeping left out" flask.txt

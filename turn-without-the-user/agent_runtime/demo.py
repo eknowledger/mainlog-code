@@ -7,6 +7,7 @@
 import asyncio
 import sys
 
+from . import handoff as h
 from . import scenarios as s
 from .runtime import render_messages
 
@@ -69,13 +70,18 @@ SCENARIOS = {
     "crash-in-memory": lambda: s.crash_mid_revision(durable=False),
     "crash-during-text": lambda: s.crash_mid_revision(durable=True, at="text"),
     "crash-during-cancel": lambda: s.crash_mid_revision(durable=True, at="cancel"),
+    # handoff article: each style, with the first request landed (reply lost) or still in the network
+    **{f"handoff-{style}{'-delayed' if delayed else ''}": (lambda style=style, delayed=delayed:
+                                                           h.handoff_run(style, delayed))
+       for style in h.STYLES for delayed in (False, True)},
+    "handoff-someone-else": lambda: h.handoff_run("full", delayed=True, someone_else=True),
 }
 
 
 def show(result, history=False, messages=False):
     print(result["timeline"].render(result["start"]))
-    booked = [f"{r} ({v['day']} {v['time']})" for r, v in sorted(result["reservations"].items())
-              if v["status"] == "booked"]
+    booked = [f"{r} ({v['day']} {v['time']}{', ' + v['owner'] if v.get('owner') else ''})"
+              for r, v in sorted(result["reservations"].items()) if v["status"] == "booked"]
     print(f"-- restaurant holds: {', '.join(booked) or 'nothing'}")
     for to, text in result["texts"]:
         print(f"-- {to} received: {text!r}")

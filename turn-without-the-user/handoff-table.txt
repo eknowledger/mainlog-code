@@ -1,0 +1,7 @@
+handoff style                     words B  record B | tables if it landed | if it was delayed
+full transcript                      1838         0 |                   1 | 2
+transcript, tools removed             303         0 |                   1 | 2
+last message + transfer               200         0 |                   1 | 2
+model brief, mentions the call        265         0 |                   1 | 2
+model brief, omits the call           185         0 |                   2 | 2
+runtime handoff record                112       310 |                   1 | 1

@@ -1365,3 +1365,151 @@
 -- restaurant holds: R2 (Sat 19:00)
 -- group received: 'table for 4, Sat 19:00'
 -- agent's last message: Booked Sat 19:00 for 4 (R2). Asked the restaurant to cancel R1 (Fri 19:00); I couldn't confirm it went through. Texted group.
+== handoff-full
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  restaurant        committed R1 Fri 19:00 x4
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: full transcript (words 1838 B, record none)
+ 6  model.read        sees reserve_table sent, and no result
+ 7  lookup.details    Fri 19:00 x4: R1 (no key to close)
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-full-delayed
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  tool.unknown      s1 reserve_table: no reply within 10 s
+ 4  handoff           concierge -> bookings: full transcript (words 1838 B, record none)
+ 5  model.read        sees reserve_table sent, and no result
+ 6  lookup.details    Fri 19:00 x4: nothing found (no key to close)
+ 7  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 8  restaurant        committed R1 Fri 19:00 x4
+ 9  tool.result       s2 reserve_table -> R1
+10  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-no-tools
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  restaurant        committed R1 Fri 19:00 x4
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: transcript, tools removed (words 303 B, record none)
+ 6  model.read        reads "Booking it now", and no result
+ 7  lookup.details    Fri 19:00 x4: R1 (no key to close)
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-no-tools-delayed
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  tool.unknown      s1 reserve_table: no reply within 10 s
+ 4  handoff           concierge -> bookings: transcript, tools removed (words 303 B, record none)
+ 5  model.read        reads "Booking it now", and no result
+ 6  lookup.details    Fri 19:00 x4: nothing found (no key to close)
+ 7  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 8  restaurant        committed R1 Fri 19:00 x4
+ 9  tool.result       s2 reserve_table -> R1
+10  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-last-pair
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  restaurant        committed R1 Fri 19:00 x4
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: last message + transfer (words 200 B, record none)
+ 6  model.read        reads "isn't answering", and no result
+ 7  lookup.details    Fri 19:00 x4: R1 (no key to close)
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1).
+== handoff-last-pair-delayed
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  tool.unknown      s1 reserve_table: no reply within 10 s
+ 4  handoff           concierge -> bookings: last message + transfer (words 200 B, record none)
+ 5  model.read        reads "isn't answering", and no result
+ 6  lookup.details    Fri 19:00 x4: nothing found (no key to close)
+ 7  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 8  restaurant        committed R1 Fri 19:00 x4
+ 9  tool.result       s2 reserve_table -> R1
+10  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1).
+== handoff-brief
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  restaurant        committed R1 Fri 19:00 x4
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: model brief, mentions the call (words 265 B, record none)
+ 6  model.read        reads "sent the booking request", and no result
+ 7  lookup.details    Fri 19:00 x4: R1 (no key to close)
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-brief-delayed
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  tool.unknown      s1 reserve_table: no reply within 10 s
+ 4  handoff           concierge -> bookings: model brief, mentions the call (words 265 B, record none)
+ 5  model.read        reads "sent the booking request", and no result
+ 6  lookup.details    Fri 19:00 x4: nothing found (no key to close)
+ 7  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 8  restaurant        committed R1 Fri 19:00 x4
+ 9  tool.result       s2 reserve_table -> R1
+10  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-brief-omits
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  restaurant        committed R1 Fri 19:00 x4
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: model brief, omits the call (words 185 B, record none)
+ 6  model.read        sees no booking in progress
+ 7  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 8  restaurant        committed R2 Fri 19:00 x4
+ 9  tool.result       s2 reserve_table -> R2
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R2). Texting the group.
+== handoff-brief-omits-delayed
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  tool.unknown      s1 reserve_table: no reply within 10 s
+ 4  handoff           concierge -> bookings: model brief, omits the call (words 185 B, record none)
+ 5  model.read        sees no booking in progress
+ 6  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 7  restaurant        committed R1 Fri 19:00 x4
+ 8  tool.result       s2 reserve_table -> R1
+ 9  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Fri 19:00), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-record
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  restaurant        committed R1 Fri 19:00 x4
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: runtime handoff record (words 112 B, record 310 B)
+ 6  resolve           s1:op-a2: R1; key closed
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-record-delayed
+ 1  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 3  tool.unknown      s1 reserve_table: no reply within 10 s
+ 4  handoff           concierge -> bookings: runtime handoff record (words 112 B, record 310 B)
+ 5  resolve           s1:op-a2: nothing has landed; key closed
+ 6  tool.sent         s2 reserve_table(Fri, 19:00, 4) key=s2:op-a1
+ 7  restaurant        committed R1 Fri 19:00 x4
+ 8  tool.result       s2 reserve_table -> R1
+ 9  restaurant        refused a late request: key s1:op-a2 is closed
+-- restaurant holds: R1 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.
+== handoff-someone-else
+ 1  restaurant        R1 Fri 19:00 x4 is another customer's booking
+ 2  user              Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 3  tool.sent         s1 reserve_table(Fri, 19:00, 4) key=s1:op-a2
+ 4  tool.unknown      s1 reserve_table: no reply within 10 s
+ 5  handoff           concierge -> bookings: full transcript (words 1838 B, record none)
+ 6  model.read        sees reserve_table sent, and no result
+ 7  lookup.details    Fri 19:00 x4: R1 (no key to close)
+ 8  restaurant        committed R2 Fri 19:00 x4
+-- restaurant holds: R1 (Fri 19:00, another customer's), R2 (Fri 19:00)
+-- agent's last message: Booked Fri 19:00 for 4 (R1). Texting the group.

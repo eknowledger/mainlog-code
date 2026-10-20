@@ -1,0 +1,7 @@
+anthropic 1.13.0: timeout read=600s connect=5s, max_retries=2, backoff 0.5s doubling to 8s, retry-after obeyed up to 4,294,967s
+  waits between its 2 retries: [0.5, 1.0] s, before jitter
+openai 3.28.0: timeout read=600s connect=5s, max_retries=2
+openai-agents 0.23.1: max_turns=10, ModelSettings().timeout=None
+langgraph 1.2.14: recursion_limit=10007
+worst case, one call that answers at all, max_tokens=4096: up to 4096 x 600s between tokens; one that never answers: 3 attempts x 600s + 1.5s = 1,801.5s
+  x 10 turns, openai-agents' default limit: 5.0 hours before anything gives up

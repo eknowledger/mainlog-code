@@ -1,0 +1,48 @@
+$ python investigate.py
+== The dashboard: checkout_seconds{route="/checkout", status="200"}
+  before the deploy  p50   80 ms   p99  176 ms   mean  85 ms   (10000 requests)
+  after the deploy   p50   80 ms   p99  237 ms   mean  91 ms   (10000 requests)
+  before, as histogram_quantile reads the buckets: p50 81 ms   p99 244 ms
+  after, as histogram_quantile reads the buckets: p50 81 ms   p99 250 ms
+  slowest request after the deploy: 1865 ms
+
+== The spans: 94 requests over 500 ms after the deploy, of 10000
+  by service.version: v1 0, v2 94
+  cart.items  1-10:   0 slow of  7748
+  cart.items 11-20:   0 slow of  1627
+  cart.items 21-40:   0 slow of   531
+  cart.items 41-80:  85 slow of    85
+  cart.items   81+:   9 slow of     9
+  by tenant.id: 82 different tenants, the most any one has is 3 (t165)
+  by customer.region: ap-south 23, eu-west 21, us-east 28, us-west 22
+
+== The slice: v2 with more than 40 items: 94 of 10000 requests, 0.9%
+  p50 698 ms   p99 1527 ms
+  requests over 500 ms with more than 40 items: 94 of 94
+  everyone else on v2: p50 80 ms   p99 173 ms
+  one of them: tenant t176, 61 items, 882 ms
+
+$ python series_cost.py
+prometheus_client 0.26.0, opentelemetry-sdk 1.45.1, Python 3.13.5
+
+one histogram, one label set (route, status): 18 series
+  checkout_seconds_bucket x15, checkout_seconds_count x1, checkout_seconds_sum x1, checkout_seconds_created x1
+the same histogram with a tenant label, 500 tenants: 9000 series
+a counter, one label set: 2 series (checkouts_total, checkouts_created)
+
+one span, created and ended, best of 5 x 50,000, on Darwin arm64:
+   0 attributes:   7.7 µs
+   4 attributes:   9.9 µs
+  10 attributes:  11.4 µs
+
+$ pytest -q tests -rx
+.x..                                                                     [100%]
+=========================== short test summary info ============================
+XFAIL tests/test_question_first.py::test_red_step - the red step: the span as it was before the question was written
+3 passed, 1 xfailed in 0.08s
+
+$ pytest -q tests --runxfail   # the red step, shown failing
+E       AssertionError: the span can't answer 'If checkout gets slower after the pricing change, which carts is it slower for, and on which version?': it has no cart.items
+E       assert not ['cart.items']
+FAILED tests/test_question_first.py::test_red_step - AssertionError: the span...
+1 failed, 3 passed in 0.07s

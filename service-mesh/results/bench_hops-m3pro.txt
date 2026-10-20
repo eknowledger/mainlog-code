@@ -1,0 +1,68 @@
+Envoy 1.39.3, 2 worker threads per proxy; Apple M3 Pro, 12 cores, macOS 26.6.2; Python 3.13.5
+load average before: 11.62 10.90 9.46 (other work on this machine adds noise)
+Latency: 4000 sequential requests on one connection. CPU: 1000 requests a second, open loop, 10 s after 2 s of warmup. 5 repetition(s), interleaved; 1 KB responses over HTTP/1.1
+
+  rep 1  0 hop(s) plain  p50  0.049 ms  p90  0.065 ms  p99  0.157 ms  | at 1000/s: p50  0.285 ms, proxy CPU 0.000 cores, RSS 0.0 MB/proxy
+  rep 1  1 hop(s) plain  p50  0.366 ms  p90  1.098 ms  p99  4.338 ms  | at 1000/s: p50  0.537 ms, proxy CPU 0.229 cores, RSS 41.7 MB/proxy
+  rep 1  2 hop(s) plain  p50  0.445 ms  p90  0.646 ms  p99  2.367 ms  | at 1000/s: p50  0.761 ms, proxy CPU 0.443 cores, RSS 46.9 MB/proxy
+  rep 1  3 hop(s) plain  p50  0.701 ms  p90  1.246 ms  p99  3.246 ms  | at 1000/s: p50  0.845 ms, proxy CPU 0.637 cores, RSS 46.7 MB/proxy
+  rep 1  4 hop(s) plain  p50  0.930 ms  p90  1.469 ms  p99  2.770 ms  | at 1000/s: p50  1.249 ms, proxy CPU 0.908 cores, RSS 47.5 MB/proxy
+  rep 1  1 hop(s) mTLS   p50  0.269 ms  p90  0.682 ms  p99  3.359 ms  | at 1000/s: p50  0.557 ms, proxy CPU 0.225 cores, RSS 49.2 MB/proxy
+  rep 1  2 hop(s) mTLS   p50  0.530 ms  p90  1.307 ms  p99  3.032 ms  | at 1000/s: p50  0.748 ms, proxy CPU 0.513 cores, RSS 49.1 MB/proxy
+  rep 1  3 hop(s) mTLS   p50  0.819 ms  p90  2.096 ms  p99  5.699 ms  | at 1000/s: p50  0.989 ms, proxy CPU 0.733 cores, RSS 44.9 MB/proxy
+  rep 1  4 hop(s) mTLS   p50  0.977 ms  p90  1.489 ms  p99  5.156 ms  | at 1000/s: p50  1.387 ms, proxy CPU 1.073 cores, RSS 45.9 MB/proxy
+  rep 2  0 hop(s) plain  p50  0.047 ms  p90  0.063 ms  p99  0.165 ms  | at 1000/s: p50  0.282 ms, proxy CPU 0.000 cores, RSS 0.0 MB/proxy
+  rep 2  1 hop(s) plain  p50  0.219 ms  p90  0.251 ms  p99  0.658 ms  | at 1000/s: p50  0.540 ms, proxy CPU 0.206 cores, RSS 47.1 MB/proxy
+  rep 2  2 hop(s) plain  p50  0.492 ms  p90  0.992 ms  p99  2.377 ms  | at 1000/s: p50  0.730 ms, proxy CPU 0.431 cores, RSS 42.0 MB/proxy
+  rep 2  3 hop(s) plain  p50  0.670 ms  p90  0.784 ms  p99  1.456 ms  | at 1000/s: p50  0.806 ms, proxy CPU 0.590 cores, RSS 41.4 MB/proxy
+  rep 2  4 hop(s) plain  p50  0.950 ms  p90  1.463 ms  p99  2.935 ms  | at 1000/s: p50  1.111 ms, proxy CPU 0.897 cores, RSS 47.2 MB/proxy
+  rep 2  1 hop(s) mTLS   p50  0.226 ms  p90  0.253 ms  p99  0.440 ms  | at 1000/s: p50  0.555 ms, proxy CPU 0.229 cores, RSS 49.9 MB/proxy
+  rep 2  2 hop(s) mTLS   p50  0.462 ms  p90  0.631 ms  p99  1.657 ms  | at 1000/s: p50  0.750 ms, proxy CPU 0.433 cores, RSS 49.6 MB/proxy
+  rep 2  3 hop(s) mTLS   p50  0.677 ms  p90  0.779 ms  p99  1.941 ms  | at 1000/s: p50  0.837 ms, proxy CPU 0.661 cores, RSS 49.5 MB/proxy
+  rep 2  4 hop(s) mTLS   p50  1.173 ms  p90  3.297 ms  p99  8.487 ms  | at 1000/s: p50  2.723 ms, proxy CPU 1.306 cores, RSS 45.7 MB/proxy
+  rep 3  0 hop(s) plain  p50  0.073 ms  p90  0.177 ms  p99  0.518 ms  | at 1000/s: p50  0.317 ms, proxy CPU 0.000 cores, RSS 0.0 MB/proxy
+  rep 3  1 hop(s) plain  p50  0.758 ms  p90  3.140 ms  p99 15.825 ms  | at 1000/s: p50  9.597 ms, proxy CPU 0.331 cores, RSS 41.7 MB/proxy
+  rep 3  2 hop(s) plain  p50  1.105 ms  p90  2.874 ms  p99 11.140 ms  | at 1000/s: p50  0.964 ms, proxy CPU 0.580 cores, RSS 43.4 MB/proxy
+  rep 3  3 hop(s) plain  p50  0.874 ms  p90  2.342 ms  p99  5.704 ms  | at 1000/s: p50  1.135 ms, proxy CPU 0.789 cores, RSS 41.6 MB/proxy
+  rep 3  4 hop(s) plain  p50  0.899 ms  p90  1.167 ms  p99  2.058 ms  | at 1000/s: p50  3.263 ms, proxy CPU 1.151 cores, RSS 41.2 MB/proxy
+  rep 3  1 hop(s) mTLS   p50  0.281 ms  p90  0.689 ms  p99  1.922 ms  | at 1000/s: p50  0.516 ms, proxy CPU 0.224 cores, RSS 48.8 MB/proxy
+  rep 3  2 hop(s) mTLS   p50  0.441 ms  p90  0.930 ms  p99  2.567 ms  | at 1000/s: p50  0.756 ms, proxy CPU 0.354 cores, RSS 48.9 MB/proxy
+  rep 3  3 hop(s) mTLS   p50  0.708 ms  p90  0.980 ms  p99  2.185 ms  | at 1000/s: p50  0.794 ms, proxy CPU 0.594 cores, RSS 48.4 MB/proxy
+  rep 3  4 hop(s) mTLS   p50  1.166 ms  p90  2.721 ms  p99  5.961 ms  | at 1000/s: p50  1.618 ms, proxy CPU 1.128 cores, RSS 45.6 MB/proxy
+  rep 4  0 hop(s) plain  p50  0.042 ms  p90  0.092 ms  p99  0.196 ms  | at 1000/s: p50  0.311 ms, proxy CPU 0.000 cores, RSS 0.0 MB/proxy
+  rep 4  1 hop(s) plain  p50  0.228 ms  p90  0.271 ms  p99  0.314 ms  | at 1000/s: p50  0.555 ms, proxy CPU 0.221 cores, RSS 47.4 MB/proxy
+  rep 4  2 hop(s) plain  p50  0.472 ms  p90  1.116 ms  p99  2.426 ms  | at 1000/s: p50  0.908 ms, proxy CPU 0.558 cores, RSS 42.5 MB/proxy
+  rep 4  3 hop(s) plain  p50  0.838 ms  p90  2.288 ms  p99  4.643 ms  | at 1000/s: p50  1.558 ms, proxy CPU 0.857 cores, RSS 41.9 MB/proxy
+  rep 4  4 hop(s) plain  p50  0.923 ms  p90  1.175 ms  p99  2.832 ms  | at 1000/s: p50  1.101 ms, proxy CPU 0.862 cores, RSS 46.7 MB/proxy
+  rep 4  1 hop(s) mTLS   p50  0.231 ms  p90  0.264 ms  p99  0.426 ms  | at 1000/s: p50  0.542 ms, proxy CPU 0.212 cores, RSS 49.1 MB/proxy
+  rep 4  2 hop(s) mTLS   p50  0.453 ms  p90  0.533 ms  p99  1.480 ms  | at 1000/s: p50  0.762 ms, proxy CPU 0.395 cores, RSS 48.5 MB/proxy
+  rep 4  3 hop(s) mTLS   p50  0.877 ms  p90  2.214 ms  p99  4.357 ms  | at 1000/s: p50  1.094 ms, proxy CPU 0.789 cores, RSS 44.5 MB/proxy
+  rep 4  4 hop(s) mTLS   p50  0.943 ms  p90  1.184 ms  p99  2.720 ms  | at 1000/s: p50  1.637 ms, proxy CPU 1.062 cores, RSS 42.6 MB/proxy
+  rep 5  0 hop(s) plain  p50  0.052 ms  p90  0.129 ms  p99  0.874 ms  | at 1000/s: p50  0.303 ms, proxy CPU 0.000 cores, RSS 0.0 MB/proxy
+  rep 5  1 hop(s) plain  p50  0.228 ms  p90  0.284 ms  p99  1.051 ms  | at 1000/s: p50  0.638 ms, proxy CPU 0.277 cores, RSS 42.7 MB/proxy
+  rep 5  2 hop(s) plain  p50  0.488 ms  p90  1.410 ms  p99  3.326 ms  | at 1000/s: p50  1.615 ms, proxy CPU 0.665 cores, RSS 43.7 MB/proxy
+  rep 5  3 hop(s) plain  p50  0.677 ms  p90  1.142 ms  p99  2.639 ms  | at 1000/s: p50  0.798 ms, proxy CPU 0.611 cores, RSS 47.8 MB/proxy
+  rep 5  4 hop(s) plain  p50  0.906 ms  p90  1.376 ms  p99  3.218 ms  | at 1000/s: p50  1.817 ms, proxy CPU 0.983 cores, RSS 42.7 MB/proxy
+  rep 5  1 hop(s) mTLS   p50  0.238 ms  p90  0.324 ms  p99  0.625 ms  | at 1000/s: p50  0.540 ms, proxy CPU 0.223 cores, RSS 49.3 MB/proxy
+  rep 5  2 hop(s) mTLS   p50  0.458 ms  p90  0.614 ms  p99  1.297 ms  | at 1000/s: p50  0.744 ms, proxy CPU 0.392 cores, RSS 43.3 MB/proxy
+  rep 5  3 hop(s) mTLS   p50  0.702 ms  p90  1.561 ms  p99  3.404 ms  | at 1000/s: p50  0.866 ms, proxy CPU 0.689 cores, RSS 44.2 MB/proxy
+  rep 5  4 hop(s) mTLS   p50  0.956 ms  p90  1.358 ms  p99  2.636 ms  | at 1000/s: p50  1.002 ms, proxy CPU 0.764 cores, RSS 48.5 MB/proxy
+
+load average after: 7.98 12.23 11.71
+Median over repetitions:
+  hops          p50 ms   p90 ms   p99 ms  +p50/hop  proxy cores  vCPU/proxy/1000rps  RSS MB/proxy
+     0  -        0.049    0.092    0.196
+     1  plain    0.228    0.284    1.051     179µs        0.229               0.114          42.7
+     2  plain    0.488    1.116    2.426     219µs        0.558               0.140          43.4
+     3  plain    0.701    1.246    3.246     217µs        0.637               0.106          41.9
+     4  plain    0.923    1.376    2.832     218µs        0.908               0.113          46.7
+     1  mTLS     0.238    0.324    0.625     189µs        0.224               0.112          49.2
+     2  mTLS     0.458    0.631    1.657     205µs        0.395               0.099          48.9
+     3  mTLS     0.708    1.561    3.404     220µs        0.689               0.115          44.9
+     4  mTLS     0.977    1.489    5.156     232µs        1.073               0.134          45.7
+  per hop, plain, p50: 222 µs (least squares over 0 to 4 hops)
+  per hop, plain, p90: 353 µs (least squares over 0 to 4 hops)
+  CPU, plain: 0.114 vCPU per proxy per 1000 req/s (median over every run with a proxy), so 0.228 per hop
+  per hop, mTLS, p50: 233 µs (least squares over 0 to 4 hops)
+  per hop, mTLS, p90: 403 µs (least squares over 0 to 4 hops)
+  CPU, mTLS: 0.112 vCPU per proxy per 1000 req/s (median over every run with a proxy), so 0.224 per hop

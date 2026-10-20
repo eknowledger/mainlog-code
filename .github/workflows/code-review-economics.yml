@@ -1,0 +1,41 @@
+name: code-review-economics
+# Runs only when this post's folder changes. Everything runs on the committed snapshot in data/, so CI never calls
+# GitHub and the numbers the post quotes can't drift as the three repositories merge more PRs.
+on:
+  push:
+    paths: ["code-review-economics/**", ".github/workflows/code-review-economics.yml"]
+  pull_request:
+    paths: ["code-review-economics/**", ".github/workflows/code-review-economics.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: code-review-economics
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -v
+      - name: The snapshot prints what the post quotes
+        run: |
+          python split_cost.py data/*.jsonl | tee /tmp/out.txt
+          diff demo-output.txt /tmp/out.txt
+          grep -F "astral-sh/ruff: 708 of 1000 merged PRs" /tmp/out.txt
+          grep -F "left out: 122 written by bots; 170 by people with no review by anyone else, median 44 lines against 158" /tmp/out.txt
+          grep -F "left out: 2 written by bots; 376 by people with no review by anyone else, median 110 lines against 62" /tmp/out.txt
+          grep -F "fit: e = 0.43 (95% bootstrap 0.31 to 0.55), r = 0.27, n = 708" /tmp/out.txt
+          grep -F "fit: e = 0.25 (95% bootstrap 0.17 to 0.34), r = 0.19, n = 857" /tmp/out.txt
+          grep -F "fit: e = 0.18 (95% bootstrap 0.06 to 0.29), r = 0.12, n = 622" /tmp/out.txt
+          grep -F "without the 96 PRs reviewed within 3 minutes of being ready: e = 0.16, n = 761" /tmp/out.txt
+          grep -E "^ +8 +x4.76 \(3.96 to 5.65\) +x3.10 +x0.59 \| +x8 +x5.12 +x1.00$" /tmp/out.txt
+          grep -E "^ +8 +x3.27 \(2.56 to 4.17\) +x2.08 +x0.41 \| +x8 +x4.89 +x1.00$" /tmp/out.txt
+          grep -E "^ +8 +x5.52 \(4.36 to 6.99\) +x3.32 +x0.69 \| +x8 +x4.66 +x1.00$" /tmp/out.txt
+          grep -E "^ +11-50 +158 +2.37 h +1.05$" /tmp/out.txt
+          grep -E "^ +501-2000 +144 +2.96 h +0.35$" /tmp/out.txt
+      - name: The CSV the tool reads
+        run: |
+          python split_cost.py --csv data/grafana_grafana.jsonl > /tmp/grafana.csv
+          test "$(wc -l < /tmp/grafana.csv)" -eq 858

@@ -1,0 +1,54 @@
+name: measuring-latency
+# Runs only when this post's folder changes. The model is seeded, so its output is checked line for line against what
+# the post quotes; the coordinated-omission run is real timing on a shared runner, so it gets a band.
+on:
+  push:
+    paths: ["measuring-latency/**", ".github/workflows/measuring-latency.yml"]
+  pull_request:
+    paths: ["measuring-latency/**", ".github/workflows/measuring-latency.yml"]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: measuring-latency
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -v
+      - name: The model prints what the post quotes
+        run: |
+          python latency_questions.py | tee /tmp/equal.txt
+          diff demo-output.txt /tmp/equal.txt
+          grep -F "mean 23.4 ms, p50 20.0, p99 49.0, p99.9 552.7" /tmp/equal.txt
+          grep -F "Little's law: 2000 req/s x 23.4 ms = 46.8 requests in flight on average" /tmp/equal.txt
+          grep -F "average of host p99s 149.5 ms vs true p99 49.0 ms: 3.05x, too high" /tmp/equal.txt
+          grep -F "sum to 99,517 of 100,000 = 99.517%; pooled 99.517%" /tmp/equal.txt
+          grep -F "pages over 100 ms  9.1%" /tmp/equal.txt
+          python latency_questions.py --busy 0.7 | tee /tmp/busy.txt
+          diff demo-output-busy.txt /tmp/busy.txt
+          grep -F "average of host p99s 151.3 ms vs true p99 409.7 ms: 0.37x, too low" /tmp/busy.txt
+          grep -F "unweighted average of means 23.5 ms" /tmp/busy.txt
+          python latency_questions.py --csv sweep | diff sweep.csv -
+          python latency_questions.py --csv fanout | diff fanout.csv -
+          python make_tool_samples.py | diff tool-samples.txt -
+      - name: Coordinated omission, on a real server, within a band
+        timeout-minutes: 3
+        run: |
+          python omission.py | tee /tmp/omission.txt
+          python - <<'PY'
+          import re
+          text = open("/tmp/omission.txt").read()
+          # The send-time p99 is ordinary localhost jitter (10 freezes make 10 slow requests in 2,001, under the 1% a
+          # p99 sees), so it moves several-fold between runs and no ratio built on it is stable. These three are.
+          due_p99 = float(re.search(r"from scheduled time .* p99 +([\d.]+)", text).group(1))
+          sent_over = int(re.search(r"from send time .* over 10 ms: (\d+)", text).group(1))
+          due_over = int(re.search(r"from scheduled time .* over 10 ms: (\d+)", text).group(1))
+          assert due_p99 > 150, due_p99
+          assert sent_over <= 25, sent_over
+          assert due_over >= 300, due_over
+          print(f"scheduled p99 {due_p99} ms; over 10 ms: {sent_over} from send time, {due_over} from scheduled time")
+          PY

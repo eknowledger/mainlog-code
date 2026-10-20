@@ -1,0 +1,50 @@
+recorded run: 66 calls to Claude, anthropic 1.13.0
+
+== Claude Opus 5.5, the seven scripted steps, repetition 1
+  free-form                  sent 11,876  cached-read  9,366  input cost  3,368.6  total 11,218.5
+  per-state tools            sent  4,675  cached-read    761  input cost  4,142.3  total 10,922.3
+  fixed tools + code check   sent 12,236  cached-read  9,378  input cost  3,717.7  total  9,277.6
+  rep 1 per-state tools: 61% fewer tokens sent; input cost +23% step for step, +14% counting the closing call; total -2.6%
+  rep 2 per-state tools: 61% fewer tokens sent; input cost +23% step for step, +14% counting the closing call; total -3.7%
+
+== Claude Opus 5.5, the whole booking
+  free-form                       rep 1: model calls 8, model time  33.8 s, sent 13,636, input cost 3,645.6, output 1,807, total 12,680.6
+  free-form                       rep 2: model calls 8, model time  30.5 s, sent 13,636, input cost 3,645.6, output 1,747, total 12,380.6
+  state machine, code runs steps  rep 1: model calls 2, model time   8.7 s, sent  1,143, input cost 1,143.0, output   472, total 3,503.0
+  state machine, code runs steps  rep 2: model calls 2, model time   7.2 s, sent  1,143, input cost 1,143.0, output   436, total 3,323.0
+
+== Claude Sonnet 5, the seven scripted steps, repetition 1
+  free-form                  sent 12,338  cached-read  9,774  input cost  3,948.7  total 12,968.6
+  per-state tools            sent  5,137  cached-read      0  input cost  5,137.0  total 11,552.0
+  fixed tools + code check   sent 12,698  cached-read  9,786  input cost  4,298.4  total 16,988.3
+  rep 1 per-state tools: 58% fewer tokens sent; input cost +30% step for step, +19% counting the closing call; total -10.9%
+
+== Claude Sonnet 5, the whole booking
+  free-form                       rep 1: model calls 8, model time  30.4 s, sent 14,164, input cost 4,308.6, output 2,352, total 16,068.5
+  state machine, code runs steps  rep 1: model calls 2, model time   8.2 s, sent  1,275, input cost 1,275.0, output   605, total 4,300.0
+
+state machine table: 7 states x 17 events = 119 cells, 13 drawn, 106 needing a decision
+  outcomes: 32 move, 22 stay, 6 defer, 59 reject
+   59  a result this state never asked for: reject it, which means log it and do nothing
+    6  a reservation exists that this state didn't make; it is real, so report it
+    6  a payment went through that this state didn't make; it is real money, so report it
+    6  a text went out that this state didn't send; it can't be recalled, so report it
+    6  nothing was waiting for the model
+    5  this state runs as code, so the model being down changes nothing here
+    3  nothing is committed yet, so start again from the new request
+    2  no slot has been chosen yet, so the next availability check covers it
+    2  this state needs the model; say what is done and wait
+    2  a booking or a text is in flight; let it resolve, then revise what it left behind
+    2  a booking that existed is gone; tell the user and ask before rebooking
+    1  the slot the user is being asked about is gone; search before asking
+    1  the booking's own result decides: refused, or committed and then gone
+    1  a booking exists; finish telling the user, then revise it rather than start again
+    1  the user knows; keep waiting for the model
+    1  reading the new request needs the model; hold it until the model is back
+    1  hold it; the state the machine resumes into knows whether a booking exists
+    1  return to the state it left, which the machine remembered
+  user_revises: drawn in 0 of 7 states
+  slot_gone: drawn in 0 of 7 states
+  model_unavailable: drawn in 0 of 7 states
+
+free-form: any of 8 tools at every step; of the 4,096 four-call sequences, 1,400 (34%) reserve without having checked availability first (what the loop can express, not what a model did)

@@ -1,0 +1,1259 @@
+{
+ "sdk": "1.13.0",
+ "calls": [
+  {
+   "seconds": 3.81,
+   "input": 93,
+   "cache_write": 1561,
+   "cache_read": 0,
+   "output": 203,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability",
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.368,
+   "input": 93,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 185,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 5.171,
+   "input": 119,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 280,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 5.697,
+   "input": 134,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 268,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 5.181,
+   "input": 153,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 319,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit",
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.613,
+   "input": 168,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 175,
+   "stop": "tool_use",
+   "tools_called": [
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.919,
+   "input": 189,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 140,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.036,
+   "input": 199,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 237,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "free",
+   "step": 8,
+   "state": "final",
+   "expected": null,
+   "outside_allowed": []
+  },
+  {
+   "seconds": 5.41,
+   "input": 456,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 323,
+   "stop": "end_turn",
+   "tools_called": [],
+   "ntools": 1,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.543,
+   "input": 573,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 132,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 1,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.917,
+   "input": 484,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 221,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 1,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.854,
+   "input": 134,
+   "cache_write": 761,
+   "cache_read": 0,
+   "output": 228,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 3,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.317,
+   "input": 153,
+   "cache_write": 0,
+   "cache_read": 761,
+   "output": 134,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit"
+   ],
+   "ntools": 3,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.636,
+   "input": 666,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 169,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 2,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.28,
+   "input": 687,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 149,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 2,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "states",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.692,
+   "input": 138,
+   "cache_write": 1563,
+   "cache_read": 0,
+   "output": 260,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.192,
+   "input": 131,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 94,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.965,
+   "input": 166,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 146,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.424,
+   "input": 199,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 188,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.942,
+   "input": 218,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 140,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.4,
+   "input": 211,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 172,
+   "stop": "tool_use",
+   "tools_called": [
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.416,
+   "input": 232,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 112,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.321,
+   "input": 93,
+   "cache_write": 1561,
+   "cache_read": 0,
+   "output": 240,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability",
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.581,
+   "input": 93,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 223,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability",
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.702,
+   "input": 119,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 239,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.642,
+   "input": 134,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 268,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.533,
+   "input": 153,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 297,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit",
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.179,
+   "input": 168,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 151,
+   "stop": "tool_use",
+   "tools_called": [
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.978,
+   "input": 189,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 141,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.583,
+   "input": 199,
+   "cache_write": 0,
+   "cache_read": 1561,
+   "output": 188,
+   "stop": "end_turn",
+   "tools_called": [],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "free",
+   "step": 8,
+   "state": "final",
+   "expected": null,
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.049,
+   "input": 456,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 277,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 1,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.798,
+   "input": 573,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 134,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 1,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.382,
+   "input": 484,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 253,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 1,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.481,
+   "input": 134,
+   "cache_write": 761,
+   "cache_read": 0,
+   "output": 177,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 3,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.827,
+   "input": 153,
+   "cache_write": 0,
+   "cache_read": 761,
+   "output": 128,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit"
+   ],
+   "ntools": 3,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.172,
+   "input": 666,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 194,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 2,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.196,
+   "input": 687,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 159,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 2,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "states",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.877,
+   "input": 138,
+   "cache_write": 1563,
+   "cache_read": 0,
+   "output": 226,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.326,
+   "input": 131,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 94,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.901,
+   "input": 166,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 140,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.105,
+   "input": 199,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 190,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.905,
+   "input": 218,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 147,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.405,
+   "input": 211,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 175,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.702,
+   "input": 232,
+   "cache_write": 0,
+   "cache_read": 1563,
+   "output": 105,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-opus-5-5",
+   "rep": 2,
+   "design": "fixed",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.151,
+   "input": 91,
+   "cache_write": 1629,
+   "cache_read": 0,
+   "output": 164,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.075,
+   "input": 91,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 163,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.73,
+   "input": 117,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 196,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.422,
+   "input": 132,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 163,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 9.714,
+   "input": 151,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 859,
+   "stop": "tool_use",
+   "tools_called": [
+    "pay_deposit",
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 1.898,
+   "input": 166,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 99,
+   "stop": "tool_use",
+   "tools_called": [
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.265,
+   "input": 187,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 160,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 7.161,
+   "input": 197,
+   "cache_write": 0,
+   "cache_read": 1629,
+   "output": 548,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "free",
+   "step": 8,
+   "state": "final",
+   "expected": null,
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.961,
+   "input": 522,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 277,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 1,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.07,
+   "input": 639,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 146,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 1,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.548,
+   "input": 550,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 180,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 1,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 3.023,
+   "input": 961,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 219,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 3,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.02,
+   "input": 980,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 59,
+   "stop": "end_turn",
+   "tools_called": [],
+   "ntools": 3,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 1.531,
+   "input": 732,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 74,
+   "stop": "tool_use",
+   "tools_called": [
+    "get_contacts"
+   ],
+   "ntools": 2,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.239,
+   "input": 753,
+   "cache_write": 0,
+   "cache_read": 0,
+   "output": 328,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 2,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "states",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 12.053,
+   "input": 136,
+   "cache_write": 1631,
+   "cache_read": 0,
+   "output": 1112,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 1,
+   "state": "gather",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 1.841,
+   "input": 129,
+   "cache_write": 0,
+   "cache_read": 1631,
+   "output": 117,
+   "stop": "tool_use",
+   "tools_called": [
+    "check_availability"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 2,
+   "state": "search",
+   "expected": "check_availability",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 1.967,
+   "input": 164,
+   "cache_write": 0,
+   "cache_read": 1631,
+   "output": 109,
+   "stop": "tool_use",
+   "tools_called": [
+    "notify_user"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 3,
+   "state": "confirm",
+   "expected": "notify_user",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 2.537,
+   "input": 197,
+   "cache_write": 0,
+   "cache_read": 1631,
+   "output": 182,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 4,
+   "state": "book",
+   "expected": "reserve_table",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 6.534,
+   "input": 216,
+   "cache_write": 0,
+   "cache_read": 1631,
+   "output": 594,
+   "stop": "tool_use",
+   "tools_called": [
+    "reserve_table"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 5,
+   "state": "book",
+   "expected": "pay_deposit",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 1.453,
+   "input": 209,
+   "cache_write": 0,
+   "cache_read": 1631,
+   "output": 74,
+   "stop": "tool_use",
+   "tools_called": [
+    "get_contacts"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 6,
+   "state": "notify",
+   "expected": "get_contacts",
+   "outside_allowed": []
+  },
+  {
+   "seconds": 4.073,
+   "input": 230,
+   "cache_write": 0,
+   "cache_read": 1631,
+   "output": 350,
+   "stop": "tool_use",
+   "tools_called": [
+    "text_group"
+   ],
+   "ntools": 8,
+   "model": "claude-sonnet-5",
+   "rep": 1,
+   "design": "fixed",
+   "step": 7,
+   "state": "notify",
+   "expected": "text_group",
+   "outside_allowed": []
+  }
+ ]
+}

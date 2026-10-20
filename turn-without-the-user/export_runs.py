@@ -16,6 +16,12 @@ for name in names + [f"{n} --history" for n in WITH_HISTORY]:
     out = subprocess.run([sys.executable, "-m", "agent_runtime.demo", *name.split()], capture_output=True, text=True,
                          check=True).stdout
     runs[name] = out.split("\n", 1)[1].rstrip("\n") if out.startswith("== ") else out.rstrip("\n")
+# The handoff article's lab also shows what the receiving model reads in each style.
+styles = subprocess.run([sys.executable, "-c", "from agent_runtime.handoff import STYLES; print(*STYLES)"],
+                        capture_output=True, text=True, check=True).stdout.split()
+for style in styles:
+    runs[f"handoff --sees {style}"] = subprocess.run([sys.executable, "-m", "agent_runtime.handoff", "--sees", style],
+                                                     capture_output=True, text=True, check=True).stdout.rstrip("\n")
 with open("runs.json", "w") as f:
     json.dump(runs, f, indent=1, ensure_ascii=False)
     f.write("\n")

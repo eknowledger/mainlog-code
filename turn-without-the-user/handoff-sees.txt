@@ -1,0 +1,60 @@
+-- Bookings' model reads: full transcript, 9 item(s), 1838 B
+ 1  user                               Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  assistant, tool call               search_restaurants {"q": "Chez Lili", "near": "Paris"}
+ 3  tool result, search_restaurants    [{"name": "Chez Lili", "cuisine": "bistro", "rating": 4.6,... (1053 B in all)
+ 4  assistant, tool call               check_availability {"day": "Fri", "time": "19:00", "party": 4}
+ 5  tool result, check_availability    available
+ 6  assistant                          Friday at 19:00 is free. Booking it now.
+ 7  assistant, tool call               reserve_table {"day": "Fri", "time": "19:00", "party": 4}
+ 8  tool result, reserve_table         error: no reply from the restaurant within 10 s
+ 9  assistant                          The restaurant isn't answering. Handing over to Bookings: Friday at 19:00 for four.
+-- no record: Bookings' runtime has nothing of its own to act on
+
+-- Bookings' model reads: transcript, tools removed, 3 item(s), 303 B
+ 1  user                               Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+ 2  assistant                          Friday at 19:00 is free. Booking it now.
+ 3  assistant                          The restaurant isn't answering. Handing over to Bookings: Friday at 19:00 for four.
+-- no record: Bookings' runtime has nothing of its own to act on
+
+-- Bookings' model reads: last message + transfer, 2 item(s), 200 B
+ 1  assistant                          The restaurant isn't answering. Handing over to Bookings: Friday at 19:00 for four.
+ 2  tool result, transfer_to_bookings  Transferred to Bookings
+-- no record: Bookings' runtime has nothing of its own to act on
+
+-- Bookings' model reads: model brief, mentions the call, 1 item(s), 265 B
+ 1  user                               task: Book the table
+                                      context: User wants Chez Lili, Friday 19:00, party of 4; text the group once confirmed.
+                                        I already sent the booking request but the restaurant didn't reply within 10 s.
+                                      coworker: Bookings
+-- no record: Bookings' runtime has nothing of its own to act on
+
+-- Bookings' model reads: model brief, omits the call, 1 item(s), 185 B
+ 1  user                               task: Book the table
+                                      context: User wants Chez Lili, Friday 19:00, party of 4; text the group once confirmed.
+                                      coworker: Bookings
+-- no record: Bookings' runtime has nothing of its own to act on
+
+-- Bookings' model reads: runtime handoff record, 1 item(s), 112 B
+ 1  user                               Book Friday at seven for four at Chez Lili and text the group once it's confirmed.
+-- not for the model: the record, 310 B, which Bookings' runtime acts on first
+    {
+      "task": "book Fri 19:00 for 4 at Chez Lili, then text the group",
+      "origin": "user",
+      "constraints": [
+        "text the group only after the booking is confirmed"
+      ],
+      "open_operations": [
+        {
+          "op": "op-a2",
+          "tool": "reserve_table",
+          "args": {
+            "day": "Fri",
+            "time": "19:00",
+            "party": 4
+          },
+          "key": "s1:op-a2",
+          "state": "unknown"
+        }
+      ],
+      "pending_actions": []
+    }
